@@ -1,6 +1,6 @@
 import setuptools
 
-with open("README.md", "r") as fh:
+with open("base-image/README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
