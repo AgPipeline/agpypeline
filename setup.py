@@ -20,7 +20,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    install_requires="setuptools, numpy, influxdb, laspy, requests=2.21.0, python-dateutil, utm, matplotlib,"
-                     "Pillow, scipy, piexif, cryptography"
+    install_requires=['setuptools', 'numpy', 'influxdb', 'laspy', 'requests==2.21.0', 'python-dateutil', 'utm',
+                      'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography']
 
 )
