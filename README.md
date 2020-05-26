@@ -1,23 +1,31 @@
+# Transformer: agpypeline
+<img src="https://github.com/az-digitalag/Drone-Processing-Pipeline/raw/07b1edc34a1faea501c80f583beb07f9d6b290bb/resources/drone-pipeline.png" width="100" />
 
-# agpypeline
-This repo is used as an installable package for the entrypoint and environment transformers. It is a template to which other files can be added
+This is an installable package derived from the [base-image](https://github.com/AgPipeline/base-docker-support/tree/master/base-image) and the
+[base-transformer-class](https://github.com/AgPipeline/drone-pipeline-environment/tree/master/base-transformer-class)
 
-We are providing these to promote the development of code/container templates to reduce the cost of adding functionality to the processing pipeline.
+## Expected metadata
+There are several metadata key/value pairs that this transformer expects to receive.
+The metadata keys listed below are all defined in the [BRAPI V1.3](https://brapi.docs.apiary.io/#) standard.
 
-It is expected that all derived docker images will have their own repositories instead of residing here.
-See [Contributing](#contributing) below for more information on how to name your derived repos.
+*  studyName - the name of the study the data belongs to
+*  season - the season associated with the data
+*  observationTimeStamp - a timestamp override in ISO 8610 long format
+*  germplasmName - the name of the crop being tested in the plot
+*  collectingSite - site identification
 
-## Contributing <a name="contributing" />
-Please be sure to clearly label your folders for the environment you are targeting; starting folder names with 'aws', 'clowder', or 'cyverse' for example.
-If you are thinking of creating an environment specific folder, please consider putting it into its own repository first, using the just mentioned naming convention, to keep this one as clean as possible.
+If the observationTimeStamp metadata key is not specified, the EXIF information in source image files are checked and the earliest found timestamp will be used. 
 
-Be sure to read the [organization documentation](https://github.com/AgPipeline/Organization-info) on how to contribute.
+If the other metadata keys listed above are not specified, default and/or empty values will be used with the potential for errors.
 
-## Documenting
-After you have added your files, remember that every folder in this repo must have a README.md clearly explaining 
-the interface for derived images, how to create a derived image, and other information on how to use the images created.
-Providing a quick start guide with links to more detailed information a good approach for some situations.
-The goal is to provide documentation for users that makes it easy for them to be used.
+Derived transformers may also have additional metadata needs.
 
-## Testing
-This package may be found in the [following repo](https://github.com/AgPipeline/agpypeline).
+## Metadata provided
+The derived transformers (based upon the [simple transformer](https://github.com/AgPipeline/template-transformer-simple)) using this Docker image, or code, as their base, can expect to receive the following defined keys with values in their `check_md` parameter:
+
+* timestamp - the ISO 8610 timestamp relevant to the current dataset
+* season - the name of the season
+* experiment - the experiment name
+* context_md - metadata relevant to the current processing
+* working_folder - the workspace for the derived transformer
+* list_files - a function that returns a list containing the paths of the available files
