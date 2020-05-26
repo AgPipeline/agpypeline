@@ -1,6 +1,3 @@
-"""Class instance for Transformer
-"""
-
 import argparse
 
 
