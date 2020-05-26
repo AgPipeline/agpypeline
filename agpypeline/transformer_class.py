@@ -1,11 +1,12 @@
-import argparse
+"""Class instance for Transformer
+"""
 
+import argparse
 
 # pylint: disable=unused-argument
 class Transformer():
     """Generic class for supporting transformers
     """
-
     def __init__(self, **kwargs):
         """Performs initialization of class instance
         Arguments:
