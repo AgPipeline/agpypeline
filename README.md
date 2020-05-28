@@ -1,5 +1,4 @@
-# Transformer: agpypeline
-<img src="https://github.com/az-digitalag/Drone-Processing-Pipeline/raw/07b1edc34a1faea501c80f583beb07f9d6b290bb/resources/drone-pipeline.png" width="100" />
+# Agpypeline
 
 This is an installable package derived from the [base-image](https://github.com/AgPipeline/base-docker-support/tree/master/base-image) and the
 [base-transformer-class](https://github.com/AgPipeline/drone-pipeline-environment/tree/master/base-transformer-class)
