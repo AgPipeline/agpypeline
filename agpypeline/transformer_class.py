@@ -11,7 +11,7 @@ from terrautils.imagefile import get_epsg as tr_get_epsg, \
                                  image_get_geobounds as tr_image_get_geobounds
 import terrautils.lemnatec
 
-#import configuration
+import configuration
 
 terrautils.lemnatec.SENSOR_METADATA_CACHE = os.path.dirname(os.path.realpath(__file__))
 
