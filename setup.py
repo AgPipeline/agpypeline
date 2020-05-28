@@ -20,7 +20,7 @@ setuptools.setup(
         "License :: BSD 3-Clause License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=['setuptools', 'numpy', 'influxdb', 'laspy', 'requests==2.21.0', 'python-dateutil', 'utm',
                       'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography']
 
