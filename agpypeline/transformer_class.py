@@ -6,10 +6,10 @@ import argparse
 import datetime
 import logging
 
+import piexif
 from terrautils.imagefile import get_epsg as tr_get_epsg, \
                                  image_get_geobounds as tr_image_get_geobounds
 import terrautils.lemnatec
-import piexif
 
 import configuration
 
