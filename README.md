@@ -8,7 +8,6 @@ This is an installable package derived from the [base-image](https://github.com/
 There are several metadata key/value pairs that a user of entrypoint and transformer_class modules expects to receive.
 The metadata keys listed below are all defined in the [BRAPI V1.3](https://brapi.docs.apiary.io/#) standard.
 
-**Optional**
 *  studyName - the name of the study the data belongs to
 *  season - the season associated with the data
 *  observationTimeStamp - a timestamp override in ISO 8610 long format
@@ -22,7 +21,7 @@ If the other metadata keys listed above are not specified, default and/or empty 
 Individual users of this library may also have additional metadata needs.
 
 ## Metadata provided
-The derived libraries/transformers using this library as their base, can expect to receive the following defined keys with values in their `check_md` parameter:
+The derived transformers using this library as their base, can expect to receive the following defined keys with values in their `check_md` parameter:
 
 * timestamp - the ISO 8610 timestamp relevant to the current dataset
 * season - the name of the season
