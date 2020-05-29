@@ -1,3 +1,6 @@
+"""Allows for the code library to be an installable package and lists the install requirements
+"""
+
 import setuptools
 
 with open("README.md", "r") as fh:

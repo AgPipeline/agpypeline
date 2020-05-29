@@ -5,3 +5,4 @@ mv ./code/docker/ ./
 mv ./code/modules/ ./
 mv ./code/opendm/ ./
 mv ./code/stages/ ./
+mv ./actions_github/* ./
