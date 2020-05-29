@@ -1,4 +1,5 @@
 # AgPypeline
+- Python library of common classes and functions
 
 This is an installable package derived from the [base-image](https://github.com/AgPipeline/base-docker-support/tree/master/base-image) and the
 [base-transformer-class](https://github.com/AgPipeline/drone-pipeline-environment/tree/master/base-transformer-class)
