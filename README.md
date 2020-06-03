@@ -29,5 +29,3 @@ The derived transformers using this library as their base, can expect to receive
 * context_md - metadata relevant to the current processing
 * working_folder - the workspace for the derived transformer
 * list_files - a function that returns a list containing the paths of the available files
-
-

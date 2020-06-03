@@ -8,7 +8,7 @@ TRANSFORMER_VERSION = '1.0'
 TRANSFORMER_DESCRIPTION = 'Provides entrypoint and environment functionality'
 
 # Short name of the transformer
-TRANSFORMER_NAME = 'opendronemap'
+TRANSFORMER_NAME = 'testing'
 
 # The sensor associated with the transformer
 TRANSFORMER_SENSOR = 'rgb'
