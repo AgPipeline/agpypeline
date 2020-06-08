@@ -1,4 +1,4 @@
-"""Class instance forTransformer
+"""Class instance for Transformer
 """
 
 import argparse
