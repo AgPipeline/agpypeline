@@ -25,8 +25,6 @@ jobs:
         id: install_python_3_7
       - name: Updated python version
         run: python3 --version
-      - name: PYTHONPATH environment variable
-        run: echo ${PYTHONPATH}
       - name: Update pip
         run: python3 -m pip install --upgrade --no-cache-dir pip
         id: pip-install
