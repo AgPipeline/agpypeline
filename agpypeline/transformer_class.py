@@ -174,7 +174,7 @@ class Transformer():
             is returned if the boundaries can't be determined
         """
         # pylint: disable=no-self-use
-         logger = logging.getLogger(__name__)
+        logger = logging.getLogger(__name__)
 
         try:
             src = gdal.Open(source_path)
