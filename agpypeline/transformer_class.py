@@ -8,6 +8,7 @@ import logging
 
 import piexif
 
+from numpy import nan
 from osgeo import gdal
 from osgeo import osr
 
@@ -151,18 +152,18 @@ class Transformer():
         # pylint: disable=no-self-use
         logger = logging.getLogger(__name__)
 
-    try:
-        src = gdal.Open(filename)
+        try:
+            src = gdal.Open(source_path)
 
-        proj = osr.SpatialReference(wkt=src.GetProjection())
+            proj = osr.SpatialReference(wkt=src.GetProjection())
 
-        return proj.GetAttrValue('AUTHORITY', 1)
-    # pylint: disable=broad-except
-    except Exception as ex:
-        logger.warn("[get_epsg] Exception caught: %s", str(ex))
-    # pylint: enable=broad-except
+            return proj.GetAttrValue('AUTHORITY', 1)
+        # pylint: disable=broad-except
+        except Exception as ex:
+            logger.warn("[get_epsg] Exception caught: %s", str(ex))
+        # pylint: enable=broad-except
 
-    return None
+        return None
 
     def get_image_file_geobounds(self, source_path: str) -> list:
         """Uses gdal functionality to retrieve rectilinear boundaries from the file
@@ -176,24 +177,24 @@ class Transformer():
         # pylint: disable=no-self-use
          logger = logging.getLogger(__name__)
 
-    try:
-        src = gdal.Open(filename)
-        ulx, xres, _, uly, _, yres = src.GetGeoTransform()
-        lrx = ulx + (src.RasterXSize * xres)
-        lry = uly + (src.RasterYSize * yres)
+        try:
+            src = gdal.Open(source_path)
+            ulx, xres, _, uly, _, yres = src.GetGeoTransform()
+            lrx = ulx + (src.RasterXSize * xres)
+            lry = uly + (src.RasterYSize * yres)
 
-        min_y = min(uly, lry)
-        max_y = max(uly, lry)
-        min_x = min(ulx, lrx)
-        max_x = max(ulx, lrx)
+            min_y = min(uly, lry)
+            max_y = max(uly, lry)
+            min_x = min(ulx, lrx)
+            max_x = max(ulx, lrx)
 
-        return [min_y, max_y, min_x, max_x]
-    # pylint: disable=broad-except
-    except Exception as ex:
-        logger.info("[image_get_geobounds] Exception caught: %s", str(ex))
-    # pylint: enable=broad-except
+            return [min_y, max_y, min_x, max_x]
+        # pylint: disable=broad-except
+        except Exception as ex:
+            logger.info("[image_get_geobounds] Exception caught: %s", str(ex))
+        # pylint: enable=broad-except
 
-    return [nan, nan, nan, nan]
+        return [nan, nan, nan, nan]
 
     def generate_transformer_md(self) -> dict:
         """Generates metadata about this transformer
