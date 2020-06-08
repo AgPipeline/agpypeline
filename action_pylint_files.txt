@@ -1,9 +1,0 @@
-./actions_github/configuration.py
-./actions_github/transformer.py
-./agpypeline/__init__.py
-./agpypeline/transformer_class.py
-./agpypeline/entrypoint.py
-./agpypeline/.ipynb_checkpoints/transformer_class-checkpoint.py
-./agpypeline/.ipynb_checkpoints/entrypoint-checkpoint.py
-./setup.py
-./.ipynb_checkpoints/setup-checkpoint.py
