@@ -25,7 +25,6 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=['setuptools', 'numpy', 'influxdb', 'laspy', 'requests==2.21.0', 'python-dateutil', 'utm',
-                      'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography', 'python3-gdal', 'gdal-bin',
-                      'libgdal-dev', 'gcc', 'g++', 'python3.7-dev', 'pygdal=2.4.2.5']
+                      'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography']
 
 )
