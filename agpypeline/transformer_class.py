@@ -1,7 +1,6 @@
 """Class instance for Transformer
 """
 
-import os
 import argparse
 import datetime
 import logging
@@ -160,7 +159,7 @@ class Transformer():
             return proj.GetAttrValue('AUTHORITY', 1)
         # pylint: disable=broad-except
         except Exception as ex:
-            logger.warn("[get_epsg] Exception caught: %s", str(ex))
+            logger.warning("[get_epsg] Exception caught: %s", str(ex))
         # pylint: enable=broad-except
 
         return None
