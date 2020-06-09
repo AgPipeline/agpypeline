@@ -282,4 +282,3 @@ class Transformer():
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
                 }
-
