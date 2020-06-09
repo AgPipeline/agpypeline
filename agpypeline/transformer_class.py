@@ -8,20 +8,20 @@ import logging
 import piexif
 
 from numpy import nan
-from osgeo import gdal
-from osgeo import osr
+from osgeo import gdal, osr
 
 import configuration
 
 # EXIF tags to look for
-EXIF_ORIGIN_TIMESTAMP = 36867         # Capture timestamp
-EXIF_TIMESTAMP_OFFSET = 36881         # Timestamp UTC offset (general)
+EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
+EXIF_TIMESTAMP_OFFSET = 36881  # Timestamp UTC offset (general)
 EXIF_ORIGIN_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
 
 
 class __internal__():
     """Class containing functions for this file only
     """
+
     def __init__(self):
         """Perform class level initialization
         """
@@ -149,18 +149,14 @@ class Transformer():
             doesn't have an EPSG code
         """
         # pylint: disable=no-self-use
-        logger = logging.getLogger(__name__)
-
         try:
             src = gdal.Open(source_path)
 
             proj = osr.SpatialReference(wkt=src.GetProjection())
 
             return proj.GetAttrValue('AUTHORITY', 1)
-        # pylint: disable=broad-except
         except Exception as ex:
-            logger.warning("[get_epsg] Exception caught: %s", str(ex))
-        # pylint: enable=broad-except
+            logging.debug("[get_image_file_epsg] Exception caught: %s", str(ex))
 
         return None
 
@@ -174,8 +170,6 @@ class Transformer():
             is returned if the boundaries can't be determined
         """
         # pylint: disable=no-self-use
-        logger = logging.getLogger(__name__)
-
         try:
             src = gdal.Open(source_path)
             ulx, xres, _, uly, _, yres = src.GetGeoTransform()
@@ -188,10 +182,8 @@ class Transformer():
             max_x = max(ulx, lrx)
 
             return [min_y, max_y, min_x, max_x]
-        # pylint: disable=broad-except
         except Exception as ex:
-            logger.info("[image_get_geobounds] Exception caught: %s", str(ex))
-        # pylint: enable=broad-except
+            logging.debug("[get_image_file_geobounds] Exception caught: %s", str(ex))
 
         return [nan, nan, nan, nan]
 
@@ -284,9 +276,10 @@ class Transformer():
                     'context_md': None,
                     'working_folder': args.working_space,
                     'list_files': lambda: file_list
-                   }
+                    }
 
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
-               }
+                }
+
