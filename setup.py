@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
-    name="agpypeline",
+    name="agpypelinetest",
     version="0.0.1",
     author="Jacob van der Leeuw",
     author_email="jvanderleeuw@email.arizona.edu",
@@ -20,7 +20,6 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: BSD 3-Clause License",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.7',

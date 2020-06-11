@@ -3,18 +3,20 @@
 """
 
 import argparse
-import os
 import json
 import logging
+import os
+import sys
 from typing import Optional
 import yaml
 
-import transformer_class
+from importlib import import_module
+from transformer_class import Transformer
 
-# From derived images
-import configuration
-import transformer
-
+path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
+sys.path.insert(0, path)
+configuration = import_module('configuration')
+transformer = import_module('transformer')
 
 class __internal__():
     """Class for functions intended for internal use only for this file
@@ -143,11 +145,11 @@ class __internal__():
         # pylint: disable=no-member
 
         # If we have a variable defined, check the many ways of determining False
-        if hasattr(configuration, "METADATA_NEEDED"):
+        if hasattr(configuration, 'METADATA_NEEDED'):
             if not configuration.METADATA_NEEDED:
                 return False
             if isinstance(configuration.METADATA_NEEDED, str):
-                if configuration.METADATA_NEEDED.lower().strip() == 'false':
+                if configuration.metadata_needed.lower().strip() == 'false':
                     return False
         return True
 
@@ -209,7 +211,7 @@ class __internal__():
         return (result_code, result_message)
 
     @staticmethod
-    def handle_check_continue(transformer_instance: transformer_class.Transformer, transformer_params: dict) -> dict:
+    def handle_check_continue(transformer_instance: Transformer, transformer_params: dict) -> dict:
         """Handles calling the transformer.check_continue function
         Arguments:
             transformer_instance: instance of Transformer class
@@ -219,7 +221,7 @@ class __internal__():
         """
         result = {}
 
-        if hasattr(transformer, 'check_continue'):
+        if hasattr(transformer_instance, 'check_continue'):
             check_result = transformer.check_continue(transformer_instance, **transformer_params)
             result_code, result_message = __internal__.parse_continue_result(check_result)
 
@@ -233,7 +235,7 @@ class __internal__():
         return result
 
     @staticmethod
-    def handle_retrieve_files(transformer_instance: transformer_class.Transformer,
+    def handle_retrieve_files(transformer_instance: Transformer,
                               args: argparse.Namespace, metadata: dict) -> \
             Optional[dict]:
         """Handles calling the transformer class to retrieve files
@@ -258,7 +260,7 @@ class __internal__():
         return None
 
     @staticmethod
-    def perform_processing(transformer_instance: transformer_class.Transformer, args: argparse.Namespace, metadata: dict) -> dict:
+    def perform_processing(transformer_instance: Transformer, args: argparse.Namespace, metadata: dict) -> dict:
         """Makes the calls to perform the processing
         Arguments:
             transformer_instance: instance of transformer class
@@ -377,7 +379,7 @@ def do_work(parser: argparse.ArgumentParser, **kwargs) -> dict:
     result = {}
 
     # Create an instance of the transformer
-    transformer_instance = transformer_class.Transformer(**kwargs)
+    transformer_instance = Transformer(**kwargs)
     if not transformer_instance:
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)

@@ -4,13 +4,18 @@
 import argparse
 import datetime
 import logging
+import os
+import sys
 
 import piexif
 
+from importlib import import_module
 from numpy import nan
 from osgeo import gdal, osr
 
-import configuration
+path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
+sys.path.insert(0, path)
+configuration = import_module('configuration')
 
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
@@ -127,6 +132,7 @@ class Transformer():
         # pylint: disable=unused-argument
         self.sensor = None
         self.args = None
+
 
     @property
     def default_epsg(self) -> int:
