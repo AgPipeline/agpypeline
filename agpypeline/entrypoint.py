@@ -8,9 +8,10 @@ import logging
 import os
 import sys
 from typing import Optional
-import yaml
 
 from importlib import import_module
+import yaml
+
 from transformer_class import Transformer
 
 path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
