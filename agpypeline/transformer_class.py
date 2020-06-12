@@ -14,6 +14,8 @@ import piexif
 from numpy import nan
 from osgeo import gdal, osr
 
+from configuration import Configuration
+
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
 EXIF_TIMESTAMP_OFFSET = 36881  # Timestamp UTC offset (general)
@@ -117,7 +119,7 @@ class __internal__():
         return timestamp
 
 
-class Transformer():
+class TransformerClass:
     """Generic class for supporting transformers
     """
 
@@ -197,11 +199,11 @@ class Transformer():
         """
         # pylint: disable=no-self-use
         return {
-            'version': configuration.TRANSFORMER_VERSION,
-            'name': configuration.TRANSFORMER_NAME,
-            'author': configuration.AUTHOR_NAME,
-            'description': configuration.TRANSFORMER_DESCRIPTION,
-            'repository': {'repUrl': configuration.REPOSITORY}
+            'version': Configuration.TRANSFORMER_VERSION,
+            'name': Configuration.TRANSFORMER_NAME,
+            'author': Configuration.AUTHOR_NAME,
+            'description': Configuration.TRANSFORMER_DESCRIPTION,
+            'repository': {'repUrl': Configuration.REPOSITORY}
         }
 
     def add_parameters(self, parser: argparse.ArgumentParser) -> None:
@@ -210,8 +212,8 @@ class Transformer():
             parser: instance of argparse
         """
         # pylint: disable=no-self-use
-        parser.epilog = configuration.TRANSFORMER_NAME + ' version ' + configuration.TRANSFORMER_VERSION + \
-                        ' author ' + configuration.AUTHOR_NAME + ' ' + configuration.AUTHOR_EMAIL
+        parser.epilog = Configuration.TRANSFORMER_NAME + ' version ' + Configuration.TRANSFORMER_VERSION + \
+                        ' author ' + Configuration.AUTHOR_NAME + ' ' + Configuration.AUTHOR_EMAIL
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
         """Returns a parameter list for processing data
@@ -248,11 +250,11 @@ class Transformer():
                 experiment_name = parse_md['studyName']
 
             # Check for transformer specific metadata
-            if configuration.TRANSFORMER_NAME in parse_md:
-                if isinstance(parse_md[configuration.TRANSFORMER_NAME], list):
-                    transformer_md.extend(parse_md[configuration.TRANSFORMER_NAME])
+            if Configuration.TRANSFORMER_NAME in parse_md:
+                if isinstance(parse_md[Configuration.TRANSFORMER_NAME], list):
+                    transformer_md.extend(parse_md[Configuration.TRANSFORMER_NAME])
                 else:
-                    transformer_md.append(parse_md[configuration.TRANSFORMER_NAME])
+                    transformer_md.append(parse_md[Configuration.TRANSFORMER_NAME])
         # Get the list of files, if there are some and find the earliest timestamp if a timestamp
         # hasn't been specified yet
         file_list = []

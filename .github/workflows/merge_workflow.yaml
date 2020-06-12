@@ -22,7 +22,7 @@ jobs:
         run: 'python3 -m twine upload dist/*'
       - name: input username
         shell: bash
-        run: secrets.USERNAME
+        run: secrets.PYPI_USERNAME
       - name: input password
         shell: bash
-        run: secrets.PASSWORD
+        run: secrets.PYPI_PASSWORD
