@@ -14,11 +14,6 @@ import yaml
 
 from transformer_class import Transformer
 
-path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
-sys.path.insert(0, path)
-configuration = import_module('configuration')
-transformer = import_module('transformer')
-
 class __internal__():
     """Class for functions intended for internal use only for this file
     """

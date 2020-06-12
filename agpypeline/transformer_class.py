@@ -14,10 +14,6 @@ import piexif
 from numpy import nan
 from osgeo import gdal, osr
 
-path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
-sys.path.insert(0, path)
-configuration = import_module('configuration')
-
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
 EXIF_TIMESTAMP_OFFSET = 36881  # Timestamp UTC offset (general)
