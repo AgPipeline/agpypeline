@@ -6,13 +6,10 @@ import argparse
 import json
 import logging
 import os
-import sys
 from typing import Optional
-
-from importlib import import_module
 import yaml
 
-from transformer_class import TransformerClass
+from environment import TransformerClass
 from configuration import Configuration
 
 class __internal__():

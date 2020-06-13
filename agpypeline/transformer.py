@@ -1,6 +1,6 @@
 """Template class for a Transformer Algorithm
 """
-import transformer_class
+import environment
 
 
 class Transformer:
@@ -11,7 +11,7 @@ class Transformer:
         """Initializes a class instance
         """
 
-    def perform_process(self, transformer: transformer_class.Transformer, check_md: dict, transformer_md: dict,
+    def perform_process(self, transformer: environment.Transformer, check_md: dict, transformer_md: dict,
                         full_md: dict) -> dict:
         """Perform the processing of data
         Arguments:

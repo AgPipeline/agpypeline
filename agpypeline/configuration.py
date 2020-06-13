@@ -4,32 +4,32 @@
 
 class Configuration:
     # The version number of the transformer
-    TRANSFORMER_VERSION = None
+    transformer_version = None
 
     # The transformer description
-    TRANSFORMER_DESCRIPTION = None
+    transformer_description = None
 
     # Short name of the transformer
-    TRANSFORMER_NAME = None
+    transformer_name = None
 
     # The sensor associated with the transformer
-    TRANSFORMER_SENSOR = None
+    transformer_sensor = None
 
     # The transformer type (eg: 'rgbmask', 'plotclipper')
-    TRANSFORMER_TYPE = None
+    transformer_type = None
 
     # The name of the author of the extractor
-    AUTHOR_NAME = None
+    author_name = None
 
     # The email of the author of the extractor
-    AUTHOR_EMAIL = None
+    author_email = None
 
     # Contributors to this transformer
-    CONTRUBUTORS = []
+    contributors = []
 
     # Repository URI of where the source code lives
-    REPOSITORY = None
+    repository = None
 
     # Override flag for disabling the metadata file requirement.
     # Uncomment and set to False to override default behavior
-    # METADATA_NEEDED = True
+    # metadata_needed = True
