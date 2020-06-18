@@ -112,29 +112,25 @@ class __internal__:
 
 
 class Environment:
-    """Generic class for supporting transformers
+    """Generic class for supporting transformer environments
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, configuration: Configuration, **kwargs):
         """Performs initialization of class instance
         Arguments:
+            configuration: configuration information for the current transformer instance
             kwargs: additional parameters passed in to Transformer
         """
         # pylint: disable=unused-argument
         self.sensor = None
         self.args = None
+        self.configuration = configuration
 
     @property
     def default_epsg(self) -> int:
         """Returns the current working EPSG code
         """
         return 4326
-
-    @property
-    def supported_image_file_exts(self):
-        """Returns the list of supported image file extension strings (in lower case)
-        """
-        return ['tif', 'tiff', 'jpg']
 
     def generate_transformer_md(self) -> dict:
         """Generates metadata about this transformer
@@ -143,11 +139,11 @@ class Environment:
         """
         # pylint: disable=no-self-use
         return {
-            'version': Configuration.transformer_version,
-            'name': Configuration.transformer_name,
-            'author': Configuration.author_name,
-            'description': Configuration.transformer_description,
-            'repository': {'repUrl': Configuration.repository}
+            'version': self.configuration.transformer_version,
+            'name': self.configuration.transformer_name,
+            'author': self.configuration.author_name,
+            'description': self.configuration.transformer_description,
+            'repository': {'repUrl': self.configuration.repository}
         }
 
     def add_parameters(self, parser: argparse.ArgumentParser) -> None:
@@ -156,8 +152,8 @@ class Environment:
             parser: instance of argparse
         """
         # pylint: disable=no-self-use
-        parser.epilog = Configuration.transformer_name + ' version ' + Configuration.transformer_version + \
-                        ' author ' + Configuration.author_name + ' ' + Configuration.author_email
+        parser.epilog = str(self.configuration.transformer_name) + ' version ' + str(self.configuration.transformer_version) +\
+                        ' author ' + str(self.configuration.author_name) + ' ' + str(self.configuration.author_email)
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
         """Returns a parameter list for processing data
@@ -194,11 +190,11 @@ class Environment:
                 experiment_name = parse_md['studyName']
 
             # Check for transformer specific metadata
-            if Configuration.transformer_name in parse_md:
-                if isinstance(parse_md[Configuration.transformer_name], list):
-                    transformer_md.extend(parse_md[Configuration.transformer_name])
+            if self.configuration.transformer_name in parse_md:
+                if isinstance(parse_md[self.configuration.transformer_name], list):
+                    transformer_md.extend(parse_md[self.configuration.transformer_name])
                 else:
-                    transformer_md.append(parse_md[Configuration.transformer_name])
+                    transformer_md.append(parse_md[self.configuration.transformer_name])
         # Get the list of files, if there are some and find the earliest timestamp if a timestamp
         # hasn't been specified yet
         file_list = []
@@ -215,7 +211,6 @@ class Environment:
             timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
 
         # Prepare our parameters
-
         check_md = {'timestamp': timestamp,
                     'season': season_name,
                     'experiment': experiment_name,
@@ -227,6 +222,7 @@ class Environment:
                     'list_files': lambda: file_list
                     }
 
+        # Return dictionary of parameters for Algorithm class nethod calls
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata

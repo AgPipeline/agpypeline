@@ -9,10 +9,12 @@ import os
 from typing import Optional
 import yaml
 
-from environment import TransformerClass
+from algorithm import Algorithm
+from environment import Environment
 from configuration import Configuration
 
-class __internal__():
+
+class __internal__:
     """Class for functions intended for internal use only for this file
     """
 
@@ -129,21 +131,23 @@ class __internal__():
         return None
 
     @staticmethod
-    def check_metadata_needed() -> bool:
+    def check_metadata_needed(configuration_info: Configuration) -> bool:
         """Checks if metadata is required
+        Arguments:
+            configuration_info: the configuration information of transformer
         Return:
             Returns True if metadata is required (the default is that it's required), or False if not
         """
         # Disable the following check since it's not a valid test here
-        # (METADATA_NEEDED is an optional variable)
+        # (metadata_needed is an optional variable)
         # pylint: disable=no-member
 
         # If we have a variable defined, check the many ways of determining False
-        if hasattr(Configuration, 'METADATA_NEEDED'):
-            if not Configuration.METADATA_NEEDED:
+        if hasattr(configuration_info, 'metadata_needed'):
+            if not configuration_info.metadata_needed:
                 return False
-            if isinstance(Configuration.METADATA_NEEDED, str):
-                if Configuration.METADATA_NEEDED.lower().strip() == 'false':
+            if isinstance(configuration_info.metadata_needed, str):
+                if configuration_info.metadata_needed.lower().strip() == 'false':
                     return False
         return True
 
@@ -202,21 +206,22 @@ class __internal__():
             if result_len > 1:
                 result_message = result[1]
 
-        return (result_code, result_message)
+        return result_code, result_message
 
     @staticmethod
-    def handle_check_continue(transformer_instance: TransformerClass, transformer_params: dict) -> dict:
+    def handle_check_continue(algorithm_instance: Algorithm, environment_instance: Environment, transformer_params: dict) -> dict:
         """Handles calling the transformer.check_continue function
         Arguments:
-            transformer_instance: instance of Transformer class
+            algorithm_instance: the working transformer instance
+            environment_instance: instance of Environment class
             transformer_params: dictionary of parameters to pass to transform module functions
         Return:
             Returns the result of checking to continue operation
         """
         result = {}
 
-        if hasattr(transformer_instance, 'check_continue'):
-            check_result = TransformerClass.check_continue(transformer_instance, **transformer_params)
+        if hasattr(environment_instance, 'check_continue'):
+            check_result = algorithm_instance.check_continue(environment_instance, **transformer_params)
             result_code, result_message = __internal__.parse_continue_result(check_result)
 
             if result_code:
@@ -229,22 +234,20 @@ class __internal__():
         return result
 
     @staticmethod
-    def handle_retrieve_files(transformer_instance: TransformerClass,
-                              args: argparse.Namespace, metadata: dict) -> \
-            Optional[dict]:
+    def handle_retrieve_files(environment_instance: Environment, args: argparse.Namespace, metadata: list) -> Optional[dict]:
         """Handles calling the transformer class to retrieve files
         Arguments:
-            transformer_instance: the current transformer environment
+            environment_instance: the current Environment
             args: the command line arguments
             metadata: the loaded metadata
         Return:
-            A dict containing error information if a problem occurs and None if no problems are found.
+            A dict containing error information if a problem occurs, or None if no problems are found.
         Note:
             A side effect of this function is a information message logged if the transformer class instance does not
             have a 'retrieve_files' function declared.
         """
-        if hasattr(transformer_instance, 'retrieve_files'):
-            transformer_retrieve = transformer_instance.retrieve_files(args, metadata)
+        if hasattr(environment_instance, 'retrieve_files'):
+            transformer_retrieve = environment_instance.retrieve_files(args, metadata)
             retrieve_results = __internal__.check_retrieve_results_error(transformer_retrieve)
             if retrieve_results:
                 return retrieve_results
@@ -254,10 +257,12 @@ class __internal__():
         return None
 
     @staticmethod
-    def perform_processing(transformer_instance: TransformerClass, args: argparse.Namespace, metadata: dict) -> dict:
+    def perform_processing(algorithm_instance: Algorithm, environment_instance: Environment, args: argparse.Namespace,
+                           metadata: list) -> dict:
         """Makes the calls to perform the processing
         Arguments:
-            transformer_instance: instance of transformer class
+            algorithm_instance: working Transformer instance
+            environment_instance: the current Environment
             args: the command line arguments
             metadata: the loaded metadata
         Return:
@@ -266,8 +271,8 @@ class __internal__():
         result = {}
 
         # Get the various types of parameters from the transformer instance
-        if hasattr(transformer_instance, 'get_transformer_params'):
-            transformer_params = transformer_instance.get_transformer_params(args, metadata)
+        if hasattr(environment_instance, 'get_transformer_params'):
+            transformer_params = environment_instance.get_transformer_params(args, metadata)
             if not isinstance(transformer_params, dict):
                 return __internal__.handle_error(-101,
                                                  "Invalid return from getting transformer parameters from transformer class instance")
@@ -280,8 +285,8 @@ class __internal__():
             transformer_params = {}
 
         # First check if the transformer thinks everything is in place
-        if hasattr(TransformerClass, 'check_continue'):
-            result = __internal__.handle_check_continue(transformer_instance, transformer_params)
+        if hasattr(algorithm_instance, 'check_continue'):
+            result = __internal__.handle_check_continue(algorithm_instance, environment_instance, transformer_params)
             if 'code' in result and result['code'] < 0 and 'error' not in result:
                 result['error'] = "Unknown error returned from check_continue call"
         else:
@@ -289,12 +294,12 @@ class __internal__():
 
         # Retrieve additional files if indicated by return code from the check
         if 'error' not in result and 'code' in result and result['code'] == 0:
-            result = __internal__.handle_retrieve_files(transformer_instance, args, metadata)
+            result = __internal__.handle_retrieve_files(environment_instance, args, metadata)
 
         # Next make the call to perform the processing
         if 'error' not in result:
-            if hasattr(TransformerClass, 'perform_process'):
-                result = TransformerClass.perform_process(transformer_instance, **transformer_params)
+            if hasattr(algorithm_instance, 'perform_process'):
+                result = algorithm_instance.perform_process(environment_instance, **transformer_params)
             else:
                 logging.debug("Transformer module is missing function named 'perform_process'")
                 return __internal__.handle_error(-102, "Transformer perform_process interface " +
@@ -315,7 +320,7 @@ class __internal__():
             If result_types is None then no actions are taken. If 'file' or 'all' is specified
             in result_types and result_file_path is None or empty, writing to a file is skipped
         """
-        if not result_types is None:
+        if result_types is not None:
             type_parts = [one_type.strip() for one_type in result_types.split(',')]
             if 'print' in type_parts or 'all' in type_parts:
                 print(json.dumps(result, indent=2))
@@ -331,10 +336,12 @@ class __internal__():
         return result
 
 
-def add_parameters(parser: argparse.ArgumentParser, transformer_instance) -> None:
+def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorithm, environment_instance: Environment) -> None:
     """Function to prepare and execute work unit
     Arguments:
         parser: an instance of argparse.ArgumentParser
+        algorithm_instance: working Transformer instance
+        environment_instance: the current Environment
     """
     parser.add_argument('--debug', '-d', action='store_const',
                         default=logging.WARN, const=logging.DEBUG,
@@ -353,44 +360,47 @@ def add_parameters(parser: argparse.ArgumentParser, transformer_instance) -> Non
                         help='the folder to use use as a workspace and for storing results')
 
     # Let the transformer class add parameters
-    if hasattr(transformer_instance, 'add_parameters'):
-        transformer_instance.add_parameters(parser)
+    if hasattr(environment_instance, 'add_parameters'):
+        environment_instance.add_parameters(parser)
 
     # Check if the transformer has a function defined to extend command line arguments
-    if hasattr(TransformerClass, 'add_parameters'):
-        TransformerClass.add_parameters(parser)
+    if hasattr(algorithm_instance, 'add_parameters'):
+        algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
     parser.add_argument('file_list', nargs=argparse.REMAINDER, help='additional files for transformer')
 
 
-def do_work(parser: argparse.ArgumentParser, **kwargs) -> dict:
+def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
+            algorithm_instance: Algorithm, **kwargs) -> dict:
     """Function to prepare and execute work unit
     Arguments:
         parser: an instance of argparse.ArgumentParser
+        configuration_info: instance of Configuration class
+        algorithm_instance: instance of Transformer class
         kwargs: keyword args
     """
     result = {}
 
-    # Create an instance of the transformer
-    transformer_instance = TransformerClass(**kwargs)
+    # Create an instance of the Transformer class
+    transformer_instance = Environment(configuration_info, **kwargs)
     if not transformer_instance:
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)
 
-    add_parameters(parser, transformer_instance)
+    add_parameters(parser, transformer_instance, algorithm_instance)
     args = parser.parse_args()
 
     # start logging system
     logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)
 
     # Check that we have mandatory metadata
-    if not args.metadata and __internal__.check_metadata_needed():
+    if not args.metadata and __internal__.check_metadata_needed(configuration_info):
         result = __internal__.handle_error(-1, "No metadata paths were specified.")
     else:
         md_results = __internal__.load_metadata_files(args.metadata)
         if 'metadata' in md_results:
-            result = __internal__.perform_processing(transformer_instance, args, md_results['metadata'])
+            result = __internal__.perform_processing(transformer_instance, algorithm_instance, args, md_results['metadata'])
         else:
             result = __internal__.handle_error(-3, md_results['error'])
 
@@ -403,10 +413,11 @@ def do_work(parser: argparse.ArgumentParser, **kwargs) -> dict:
     return result
 
 
-if __name__ == "__main__":
-    try:
-        PARSER = argparse.ArgumentParser(description=Configuration.TRANSFORMER_DESCRIPTION)
-        do_work(PARSER)
-    except Exception as ex:
-        logging.error("Top level exception handler caught an exception: %s", str(ex))
-        raise
+def entrypoint(configuration_info: Configuration, algorithm_instance: Algorithm):
+    """Entry point for processing
+    Arguments:
+        configuration_info: an instance of Configuration class
+        algorithm_instance: an instance of class for preparing work
+    """
+    parser = argparse.ArgumentParser(description=configuration_info.transformer_description)
+    do_work(parser, configuration_info, algorithm_instance)

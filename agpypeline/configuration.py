@@ -3,6 +3,10 @@
 
 
 class Configuration:
+    """Contains configuration information on Transformers
+    """
+    # Silence this error until we have public methods
+    # pylint: disable=too-few-public-methods
     # The version number of the transformer
     transformer_version = None
 
