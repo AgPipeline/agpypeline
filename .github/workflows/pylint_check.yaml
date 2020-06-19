@@ -4,7 +4,6 @@ on:
     branches:
       - master
       - develop
-      - old_state
   pull_request:
     branches:
       - master
