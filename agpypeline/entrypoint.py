@@ -150,7 +150,7 @@ class __internal__():
             if not configuration.METADATA_NEEDED:
                 return False
             if isinstance(configuration.METADATA_NEEDED, str):
-                if configuration.metadata_needed.lower().strip() == 'false':
+                if configuration.METADATA_NEEDED.lower().strip() == 'false':
                     return False
         return True
 
