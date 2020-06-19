@@ -2,7 +2,7 @@
 """
 
 import argparse
-import transformer_class
+from agpypeline import transformer_class
 
 
 # pylint: disable=unused-argument

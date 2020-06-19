@@ -1,29 +1,33 @@
 """Class instance for Transformer
 """
 
-import os
 import argparse
 import datetime
 import logging
+import os
+import sys
 
+from importlib import import_module
 import piexif
-from terrautils.imagefile import get_epsg as tr_get_epsg, \
-                                 image_get_geobounds as tr_image_get_geobounds
-import terrautils.lemnatec
 
-import configuration
 
-terrautils.lemnatec.SENSOR_METADATA_CACHE = os.path.dirname(os.path.realpath(__file__))
+from numpy import nan
+from osgeo import gdal, osr
+
+path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
+sys.path.insert(0, path)
+configuration = import_module('configuration')
 
 # EXIF tags to look for
-EXIF_ORIGIN_TIMESTAMP = 36867         # Capture timestamp
-EXIF_TIMESTAMP_OFFSET = 36881         # Timestamp UTC offset (general)
+EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
+EXIF_TIMESTAMP_OFFSET = 36881  # Timestamp UTC offset (general)
 EXIF_ORIGIN_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
 
 
 class __internal__():
     """Class containing functions for this file only
     """
+
     def __init__(self):
         """Perform class level initialization
         """
@@ -130,6 +134,7 @@ class Transformer():
         self.sensor = None
         self.args = None
 
+
     @property
     def default_epsg(self) -> int:
         """Returns the current working EPSG code
@@ -151,7 +156,16 @@ class Transformer():
             doesn't have an EPSG code
         """
         # pylint: disable=no-self-use
-        return tr_get_epsg(source_path)
+        try:
+            src = gdal.Open(source_path)
+
+            proj = osr.SpatialReference(wkt=src.GetProjection())
+
+            return proj.GetAttrValue('AUTHORITY', 1)
+        except Exception as ex:
+            logging.debug("[get_image_file_epsg] Exception caught: %s", str(ex))
+
+        return None
 
     def get_image_file_geobounds(self, source_path: str) -> list:
         """Uses gdal functionality to retrieve rectilinear boundaries from the file
@@ -163,7 +177,22 @@ class Transformer():
             is returned if the boundaries can't be determined
         """
         # pylint: disable=no-self-use
-        return tr_image_get_geobounds(source_path)
+        try:
+            src = gdal.Open(source_path)
+            ulx, xres, _, uly, _, yres = src.GetGeoTransform()
+            lrx = ulx + (src.RasterXSize * xres)
+            lry = uly + (src.RasterYSize * yres)
+
+            min_y = min(uly, lry)
+            max_y = max(uly, lry)
+            min_x = min(ulx, lrx)
+            max_x = max(ulx, lrx)
+
+            return [min_y, max_y, min_x, max_x]
+        except Exception as ex:
+            logging.debug("[get_image_file_geobounds] Exception caught: %s", str(ex))
+
+        return [nan, nan, nan, nan]
 
     def generate_transformer_md(self) -> dict:
         """Generates metadata about this transformer
@@ -254,9 +283,9 @@ class Transformer():
                     'context_md': None,
                     'working_folder': args.working_space,
                     'list_files': lambda: file_list
-                   }
+                    }
 
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
-               }
+                }

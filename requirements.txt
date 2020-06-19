@@ -1,2 +1,3 @@
-terrautils
+PyYAML
+numpy
 piexif
