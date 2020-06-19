@@ -7,8 +7,8 @@ with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
-    name="agpypelinetest",
-    version="0.0.1",
+    name="agpypeline",
+    version="0.0.9",
     author="Jacob van der Leeuw",
     author_email="jvanderleeuw@email.arizona.edu",
     description="Installable package for entrypoint and drone-specific environment code within a transformer",
@@ -20,10 +20,11 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
-    install_requires=['setuptools', 'numpy', 'influxdb', 'laspy', 'requests==2.21.0', 'python-dateutil', 'utm',
+    python_requires='>=3.5',
+    install_requires=['setuptools', 'numpy', 'influxdb', 'laspy', 'requests>=2.21.0', 'python-dateutil', 'utm',
                       'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography']
 
 )
