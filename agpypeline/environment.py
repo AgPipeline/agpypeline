@@ -4,6 +4,7 @@
 import argparse
 import datetime
 import logging
+from typing import Optional, Union
 import piexif
 
 from configuration import Configuration
@@ -23,23 +24,23 @@ class __internal__:
         """
 
     @staticmethod
-    def exif_tags_to_timestamp(exif_tags):
+    def exif_tags_to_timestamp(exif_tags: dict) -> Optional[datetime.datetime]:
         """Looks up the origin timestamp and a timestamp offset in the exit tags and returns
            a datetime object
         Args:
-            exif_tags(dict): The exif tags to search for timestamp information
+            exif_tags: The exif tags to search for timestamp information
         Return:
             Returns the origin timestamp when found. The return timestamp is adjusted for UTF if
             an offset is found. None is returned if a valid timestamp isn't found.
         """
         cur_stamp, cur_offset = (None, None)
 
-        def convert_and_clean_tag(value):
+        def convert_and_clean_tag(value: Union[str, bytes]) -> Optional[str]:
             """Internal helper function for handling EXIF tag values. Tests for an empty string after
                stripping colons, '+', '-', and whitespace [the spec is unclear if a +/- is needed when
                the timestamp offset is unknown (and spaces are used)].
             Args:
-                value(bytes or str): The tag value
+                value: The tag value
             Return:
                 Returns the cleaned up, and converted from bytes, string. Or None if the value is empty
                 after stripping above characters and whitespace.
@@ -125,12 +126,6 @@ class Environment:
         self.sensor = None
         self.args = None
         self.configuration = configuration
-
-    @property
-    def default_epsg(self) -> int:
-        """Returns the current working EPSG code
-        """
-        return 4326
 
     def generate_transformer_md(self) -> dict:
         """Generates metadata about this transformer

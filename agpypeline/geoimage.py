@@ -14,7 +14,7 @@ from osgeo import osr
 import geometries
 
 
-def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress=True) -> Optional[np.ndarray]:
+def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress: bool = True) -> Optional[np.ndarray]:
     """Clip raster to polygon
     Arguments:
       raster_path: path to raster file
@@ -95,6 +95,89 @@ def clip_raster_intersection(file_path: str, file_bounds: str, plot_bounds: str,
         logging.exception("Exception caught while clipping image to plot intersection")
 
 
+def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: int, nodata: int = -99,
+                   as_float: bool = False, image_md: dict = None, compress: bool = False) -> None:
+    """Generate output GeoTIFF file given a numpy pixel array and GPS boundary.
+    Arguments:
+        pixels: numpy array of pixel values.
+                    if 2-dimensional array, a single-band GeoTIFF will be created.
+                    if 3-dimensional array, a band will be created for each Z dimension.
+        gps_bounds: tuple of GeoTIFF coordinates as ( lat (y) min, lat (y) max,
+                                                        long (x) min, long (x) max)
+        out_path: path to GeoTIFF to be created
+        nodata: NoDataValue to be assigned to raster bands; set to None to ignore
+        as_float: whether to use GDT_Float32 data type instead of GDT_Byte (e.g. for decimal numbers)
+        image_md: metadata to save with the geotiff
+        compress: compress image pixels (loss less)
+    """
+    # Disable pylint check that would make code less readable
+    # pylint: disable=too-many-branches
+    dimensions = np.shape(pixels)
+    if len(dimensions) == 2:
+        nrows, ncols = dimensions
+        channels = 1
+    else:
+        nrows, ncols, channels = dimensions
+
+    geotransform = (
+        gps_bounds[2],  # upper-left x
+        (gps_bounds[3] - gps_bounds[2]) / float(ncols),  # W-E pixel resolution
+        0,  # rotation (0 = North is up)
+        gps_bounds[1],  # upper-left y
+        0,  # rotation (0 = North is up)
+        -((gps_bounds[1] - gps_bounds[0]) / float(nrows))  # N-S pixel resolution
+    )
+
+    # Create output GeoTIFF and set coordinates & projection
+    dtype = gdal.GDT_Float32 if as_float else gdal.GDT_Byte
+
+    if compress:
+        output_raster = gdal.GetDriverByName('GTiff') .Create(out_path, ncols, nrows, channels, dtype, ['COMPRESS=LZW'])
+    else:
+        output_raster = gdal.GetDriverByName('GTiff').Create(out_path, ncols, nrows, channels, dtype)
+
+    output_raster.SetGeoTransform(geotransform)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(srid)
+    output_raster.SetProjection(srs.ExportToWkt())
+
+    output_raster.SetMetadata(image_md)
+
+    if channels == 3:
+        # typically 3 channels = RGB channels
+        output_raster.GetRasterBand(1).WriteArray(pixels[:, :, 0].astype('uint8'))
+        output_raster.GetRasterBand(1).SetColorInterpretation(gdal.GCI_RedBand)
+        output_raster.GetRasterBand(1).FlushCache()
+        if nodata:
+            output_raster.GetRasterBand(1).SetNoDataValue(nodata)
+
+        output_raster.GetRasterBand(2).WriteArray(pixels[:, :, 1].astype('uint8'))
+        output_raster.GetRasterBand(2).SetColorInterpretation(gdal.GCI_GreenBand)
+        output_raster.GetRasterBand(2).FlushCache()
+        if nodata:
+            output_raster.GetRasterBand(2).SetNoDataValue(nodata)
+
+        output_raster.GetRasterBand(3).WriteArray(pixels[:, :, 2].astype('uint8'))
+        output_raster.GetRasterBand(3).SetColorInterpretation(gdal.GCI_BlueBand)
+        output_raster.GetRasterBand(3).FlushCache()
+        if nodata:
+            output_raster.GetRasterBand(3).SetNoDataValue(nodata)
+
+    elif channels > 1:
+        for chan in range(channels):
+            band = chan + 1
+            output_raster.GetRasterBand(band).WriteArray(pixels[:, :, chan].astype('uint8'))
+            output_raster.GetRasterBand(band).FlushCache()
+            if nodata:
+                output_raster.GetRasterBand(band).SetNoDataValue(nodata)
+    else:
+        # single channel image, e.g. temperature
+        output_raster.GetRasterBand(1).WriteArray(pixels)
+        output_raster.GetRasterBand(1).FlushCache()
+        if nodata:
+            output_raster.GetRasterBand(1).SetNoDataValue(nodata)
+
+
 def get_epsg(filename: str) -> Optional[str]:
     """Returns the EPSG of the georeferenced image file
     Args:
@@ -114,14 +197,13 @@ def get_epsg(filename: str) -> Optional[str]:
     return None
 
 
-def get_image_bounds_json(file_path: str, default_epsg: int = None) -> Optional[str]:
-    """Loads the boundaries of the image file and returns the GeoJSON
-       representing the bounds (including EPSG code)
+def get_image_bounds(file_path: str, default_epsg: int = None) -> Optional[ogr.Geometry]:
+    """Loads the boundaries of the image file and returns the geometry representing the bounds
     Arguments:
         file_path: path to the file from which to load the bounds
         default_epsg: the default EPSG to assume if a file has a boundary but not a coordinate system
     Return:
-        Returns the JSON representing the image boundary, or None if the
+        Returns the geometry representing the image boundary, or None if the
         bounds could not be loaded
     Notes:
         If a file doesn't have a coordinate system and a default epsg is specified, the
@@ -156,9 +238,30 @@ def get_image_bounds_json(file_path: str, default_epsg: int = None) -> Optional[
     ref_sys = osr.SpatialReference()
     if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
         poly.AssignSpatialReference(ref_sys)
-        return geometries.geometry_to_geojson(poly)
+        return poly
 
-    logging.error("Failed to import EPSG %s for image file %s", str(epsg), file_path)
+    return None
+
+
+def get_image_bounds_json(file_path: str, default_epsg: int = None) -> Optional[str]:
+    """Loads the boundaries of the image file and returns the GeoJSON
+       representing the bounds (including EPSG code)
+    Arguments:
+        file_path: path to the file from which to load the bounds
+        default_epsg: the default EPSG to assume if a file has a boundary but not a coordinate system
+    Return:
+        Returns the JSON representing the image boundary, or None if the
+        bounds could not be loaded
+    Notes:
+        If a file doesn't have a coordinate system and a default epsg is specified, the
+        return JSON will use the default_epsg.
+        If a file doesn't have a coordinate system and there isn't a default epsg specified, the boundary
+        of the image is not returned (None) and a warning is logged.
+    """
+    geom = get_image_bounds(file_path, default_epsg)
+    if geom:
+        return geometries.geometry_to_geojson(geom)
+
     return None
 
 
