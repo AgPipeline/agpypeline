@@ -1,6 +1,6 @@
 """Template class for a Transformer Algorithm
 """
-from environment import Environment
+from agpypeline.environment import Environment
 
 
 class Algorithm:

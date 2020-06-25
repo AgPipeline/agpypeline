@@ -8,7 +8,7 @@ from osgeo import ogr
 from osgeo import osr
 import liblas
 
-import geometries
+import agpypeline.geometries as geometries
 
 
 def get_las_epsg_from_header(header: liblas.header.Header) -> Optional[str]:

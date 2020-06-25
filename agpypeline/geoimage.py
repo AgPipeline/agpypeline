@@ -11,7 +11,7 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 
-import geometries
+import agpypeline.geometries as geometries
 
 
 def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress: bool = True) -> Optional[np.ndarray]:
@@ -138,7 +138,7 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
 
     output_raster.SetGeoTransform(geotransform)
     srs = osr.SpatialReference()
-    srs.ImportFromEPSG(srid)
+    srs.ImportFromEPSG(int(srid))
     output_raster.SetProjection(srs.ExportToWkt())
 
     output_raster.SetMetadata(image_md)

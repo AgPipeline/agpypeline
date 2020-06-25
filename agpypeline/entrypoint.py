@@ -9,9 +9,9 @@ import os
 from typing import Optional
 import yaml
 
-from algorithm import Algorithm
-from environment import Environment
-from configuration import Configuration
+from agpypeline.algorithm import Algorithm
+from agpypeline.environment import Environment
+from agpypeline.configuration import Configuration
 
 
 class __internal__:
@@ -257,12 +257,12 @@ class __internal__:
         return None
 
     @staticmethod
-    def perform_processing(algorithm_instance: Algorithm, environment_instance: Environment, args: argparse.Namespace,
+    def perform_processing(environment_instance: Environment, algorithm_instance: Algorithm, args: argparse.Namespace,
                            metadata: list) -> dict:
         """Makes the calls to perform the processing
         Arguments:
-            algorithm_instance: working Transformer instance
             environment_instance: the current Environment
+            algorithm_instance: working Transformer instance
             args: the command line arguments
             metadata: the loaded metadata
         Return:
@@ -299,7 +299,7 @@ class __internal__:
         # Next make the call to perform the processing
         if 'error' not in result:
             if hasattr(algorithm_instance, 'perform_process'):
-                result = algorithm_instance.perform_process(environment_instance, **transformer_params)
+                result = algorithm_instance.perform_process(environment=environment_instance, **transformer_params)
             else:
                 logging.debug("Transformer module is missing function named 'perform_process'")
                 return __internal__.handle_error(-102, "Transformer perform_process interface " +
