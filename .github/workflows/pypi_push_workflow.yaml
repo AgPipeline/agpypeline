@@ -13,7 +13,7 @@ jobs:
         run: 'python3 -m pip install --user --upgrade setuptools wheel'
       - name: Build bdist_wheel
         shell: bash
-        run: 'python3 -m  setup.py sdist bdist_wheel'
+        run: 'python3 setup.py sdist bdist_wheel'
       - name: install/upgrade twine
         shell: bash
         run: 'python3 -m pip install --user --upgrade twine'
