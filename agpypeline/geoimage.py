@@ -50,7 +50,50 @@ def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress:
     return None
 
 
-def clip_raster_intersection(file_path: str, file_bounds: str, plot_bounds: str, out_file: str) -> Optional[int]:
+def clip_raster_intersection(file_path: str, file_bounds: ogr.Geometry, plot_bounds: ogr.Geometry, out_file: str) ->\
+        Optional[int]:
+    """Clips the raster to the intersection of the file bounds and plot bounds
+    Arguments:
+        file_path: the path to the source file
+        file_bounds: the geometric boundary of the source file
+        plot_bounds: the geometric boundary of the plot to clip to
+        out_file: the path to store the clipped image
+    Return:
+        The number of pixels in the new image, or None if no pixels were saved
+    Notes:
+        Assumes the boundaries are in the same coordinate system
+    Exceptions:
+        Raises RuntimeError if the polygons are invalid
+    """
+    logging.debug("Clip to intersect of plot boundary: File: '%s' '%s' Plot: '%s'", file_path, str(file_bounds), str(plot_bounds))
+    try:
+        if not file_bounds or not plot_bounds:
+            logging.error("Invalid polygon specified for clip_raster_intersection: File: '%s' plot: '%s'",
+                          str(file_bounds), str(plot_bounds))
+            raise RuntimeError("One or more invalid polygons specified when clipping raster")
+
+        intersection = file_bounds.Intersection(plot_bounds)
+        if not intersection or not intersection.Area():
+            logging.info("File does not intersect plot boundary: %s", file_path)
+            return None
+
+        # Make sure we pass a multipolygon down to the tuple converter
+        if intersection.GetGeometryName().startswith('MULTI'):
+            multi_polygon = intersection
+        else:
+            multi_polygon = ogr.Geometry(ogr.wkbMultiPolygon)
+            multi_polygon.AddGeometry(intersection)
+
+        # Proceed to clip to the intersection
+        tuples = geometries.geometry_to_tuples(multi_polygon)
+        return clip_raster(file_path, tuples, out_path=out_file, compress=True)
+
+    except Exception as ex:
+        logging.exception("Exception caught while clipping image to plot intersection")
+        raise ex
+
+
+def clip_raster_intersection_json(file_path: str, file_bounds: str, plot_bounds: str, out_file: str) -> Optional[int]:
     """Clips the raster to the intersection of the file bounds and plot bounds
     Arguments:
         file_path: the path to the source file
@@ -66,33 +109,16 @@ def clip_raster_intersection(file_path: str, file_bounds: str, plot_bounds: str,
     """
     logging.debug("Clip to intersect of plot boundary: File: '%s' '%s' Plot: '%s'", file_path, str(file_bounds),
                   str(plot_bounds))
-    try:
-        file_poly = ogr.CreateGeometryFromJson(str(file_bounds))
-        plot_poly = ogr.CreateGeometryFromJson(str(plot_bounds))
 
-        if not file_poly or not plot_poly:
-            logging.error("Invalid polygon specified for clip_raster_intersection: File: '%s' plot: '%s'",
-                          str(file_bounds), str(plot_bounds))
-            raise RuntimeError("One or more invalid polygons specified when clipping raster")
+    file_poly = ogr.CreateGeometryFromJson(str(file_bounds))
+    plot_poly = ogr.CreateGeometryFromJson(str(plot_bounds))
 
-        intersection = file_poly.Intersection(plot_poly)
-        if not intersection or not intersection.Area():
-            logging.info("File does not intersect plot boundary: %s", file_path)
-            return None
+    if not file_poly or not plot_poly:
+        logging.error("Invalid polygon specified for clip_raster_intersection: File: '%s' plot: '%s'",
+                      str(file_bounds), str(plot_bounds))
+        raise RuntimeError("One or more invalid polygons specified when clipping raster")
 
-        # Make sure we pass a multipolygon down to the tuple converter
-        if intersection.GetGeometryName().startswith('MULTI'):
-            multi_polygon = intersection
-        else:
-            multi_polygon = ogr.Geometry(ogr.wkbMultiPolygon)
-            multi_polygon.AddGeometry(intersection)
-
-        # Proceed to clip to the intersection
-        tuples = geometries.geojson_to_tuples(geometries.geometry_to_geojson(multi_polygon))
-        return clip_raster(file_path, tuples, out_path=out_file, compress=True)
-
-    except Exception:
-        logging.exception("Exception caught while clipping image to plot intersection")
+    return clip_raster_intersection(file_path, file_poly, plot_poly, out_file)
 
 
 def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: int, nodata: int = -99,

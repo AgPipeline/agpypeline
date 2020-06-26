@@ -2,13 +2,50 @@
 """
 
 import re
+import os
 from typing import Optional
 import logging
+import subprocess
 from osgeo import ogr
 from osgeo import osr
 import liblas
 
 import agpypeline.geometries as geometries
+
+
+def clip_las(las_path: str, clip_tuple: tuple, out_path: str) -> None:
+    """Clip LAS file to polygon.
+    Arguments:
+      las_path: path to point cloud file
+      clip_tuple: tuple containing (minX, maxX, minY, maxY) of clip bounds
+      out_path: output file to write
+    Notes:
+        The clip_tuple is assumed to be in the correct coordinate system for the point cloud file
+    """
+    bounds_str = "([%s, %s], [%s, %s])" % (clip_tuple[0], clip_tuple[1], clip_tuple[2], clip_tuple[3])
+
+    pdal_dtm = out_path.replace(".las", "_dtm.json")
+    with open(pdal_dtm, 'w') as dtm:
+        dtm_data = """{
+            "pipeline": [
+                "%s",
+                {
+                    "type": "filters.crop",
+                    "bounds": "%s"
+                },
+                {
+                    "type": "writers.las",
+                    "filename": "%s"
+                }
+            ]
+        }""" % (las_path, bounds_str, out_path)
+        logging.debug("Writing dtm file contents: %s", str(dtm_data))
+        dtm.write(dtm_data)
+
+    cmd = 'pdal pipeline "%s"' % pdal_dtm
+    logging.debug("Running pipeline command: %s", cmd)
+    subprocess.call([cmd], shell=True)
+    os.remove(pdal_dtm)
 
 
 def get_las_epsg_from_header(header: liblas.header.Header) -> Optional[str]:

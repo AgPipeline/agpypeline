@@ -220,8 +220,8 @@ class __internal__:
         """
         result = {}
 
-        if hasattr(environment_instance, 'check_continue'):
-            check_result = algorithm_instance.check_continue(environment_instance, **transformer_params)
+        if hasattr(algorithm_instance, 'check_continue'):
+            check_result = algorithm_instance.check_continue(environment=environment_instance, **transformer_params)
             result_code, result_message = __internal__.parse_continue_result(check_result)
 
             if result_code:

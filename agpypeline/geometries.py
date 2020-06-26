@@ -76,49 +76,16 @@ def convert_geometry(geometry: ogr.Geometry, new_spatialreference: osr.SpatialRe
     return return_geometry
 
 
-def find_plots_intersect_boundingbox(bounding_box: str, all_plots: dict) -> dict:
-    """Returns a dict of plots that overlap the bounding box
+def geometry_to_tuples(geom: ogr.Geometry) -> tuple:
+    """Returns the bounds of the shape
     Arguments:
-        bounding_box: GeoJSON of the bounding box
-        all_plots: a dictionary of plot names with their associated geometries
+        geom: the geometry to return the bounds of
     Return:
-        A dict containing the plot names as keys with their associated geometries
-    Note:
-        If the spatial references of the geometries are specified, and they don't match, a conversion is done
-        on the plot geometries before intersection with the bounding box is determined. In this case, the original
-        plot geometries are returned
+        A tuple containing the bounds in (min Y, max Y, min X, max X) order
     """
-    bbox_poly = ogr.CreateGeometryFromJson(str(bounding_box))
-    bb_sr = bbox_poly.GetSpatialReference()
-    intersecting_plots = dict()
+    current_env = geom.GetEnvelope()
 
-    for plotname in all_plots:
-        bounds = all_plots[plotname]
-
-        yaml_bounds = yaml.safe_load(bounds)
-        current_poly = ogr.CreateGeometryFromJson(json.dumps(yaml_bounds))
-
-        # Check for a need to convert coordinate systems
-        check_poly = current_poly
-        if bb_sr:
-            poly_sr = current_poly.GetSpatialReference()
-            if poly_sr and bb_sr and not bb_sr.IsSame(poly_sr):
-                # We need to convert to the same coordinate system before an intersection
-                check_poly = convert_geometry(current_poly, bb_sr)
-                transform = osr.CreateCoordinateTransformation(poly_sr, bb_sr)
-                new_poly = current_poly.Clone()
-                if new_poly:
-                    new_poly.Transform(transform)
-                    check_poly = new_poly
-
-        intersection_with_bounding_box = bbox_poly.Intersection(check_poly)
-
-        if intersection_with_bounding_box is not None:
-            intersection = json.loads(intersection_with_bounding_box.ExportToJson())
-            if 'coordinates' in intersection and len(intersection['coordinates']) > 0:
-                intersecting_plots[plotname] = bounds
-
-    return intersecting_plots
+    return current_env[2], current_env[3], current_env[0], current_env[1]
 
 
 def geojson_to_tuples(bounding_box: str) -> tuple:
@@ -130,9 +97,7 @@ def geojson_to_tuples(bounding_box: str) -> tuple:
     """
     yaml_geom = yaml.safe_load(bounding_box)
     current_geom = ogr.CreateGeometryFromJson(json.dumps(yaml_geom))
-    current_env = current_geom.GetEnvelope()
-
-    return current_env[2], current_env[3], current_env[0], current_env[1]
+    return geometry_to_tuples(current_geom)
 
 
 def geometry_to_geojson(geom: ogr.Geometry, alt_coord_type: str = None, alt_coord_code: str = None) -> str:
