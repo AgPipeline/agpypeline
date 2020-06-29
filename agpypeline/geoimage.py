@@ -258,15 +258,7 @@ def get_image_bounds(file_path: str, default_epsg: int = None) -> Optional[ogr.G
     ring.AddPoint(bounds[2], bounds[0])  # lower left
     ring.AddPoint(bounds[2], bounds[1])  # Closing the polygon
 
-    poly = ogr.Geometry(ogr.wkbPolygon)
-    poly.AddGeometry(ring)
-
-    ref_sys = osr.SpatialReference()
-    if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
-        poly.AssignSpatialReference(ref_sys)
-        return poly
-
-    return None
+    return geometries.polygon_from_ring(ring, int(epsg))
 
 
 def get_image_bounds_json(file_path: str, default_epsg: int = None) -> Optional[str]:

@@ -3,6 +3,7 @@
 
 import json
 import logging
+from typing import Optional
 import yaml
 from osgeo import ogr
 from osgeo import osr
@@ -129,3 +130,26 @@ def geometry_to_geojson(geom: ogr.Geometry, alt_coord_type: str = None, alt_coor
         }
 
     return json.dumps(geom_json)
+
+
+def polygon_from_ring(ring: ogr.Geometry, epsg: int = None) -> Optional[ogr.Geometry]:
+    """Creates a polygon from the linear ring geometry passed in
+    Arguments:
+        ring: the linear ring to create the polygon with
+        epsg: the EPSG code to assign to the polygon
+    Return:
+        The created polygon, or None if an EPSG code is specified and can't be loaded
+    Exceptions:
+        Raises a RuntimeError if a SRID is specified but can't be loaded
+    """
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
+
+    ref_sys = osr.SpatialReference()
+    if epsg is not None:
+        if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
+            poly.AssignSpatialReference(ref_sys)
+        else:
+            return None
+
+    return poly

@@ -7,7 +7,6 @@ from typing import Optional
 import logging
 import subprocess
 from osgeo import ogr
-from osgeo import osr
 import liblas
 
 import agpypeline.geometries as geometries
@@ -108,13 +107,9 @@ def get_las_extents(file_path: str, default_epsg: int = None) -> Optional[str]:
     ring.AddPoint(max_bound[1], min_bound[0])  # lower left
     ring.AddPoint(min_bound[1], min_bound[0])  # Closing the polygon
 
-    poly = ogr.Geometry(ogr.wkbPolygon)
-    poly.AddGeometry(ring)
-
-    ref_sys = osr.SpatialReference()
-    if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
-        poly.AssignSpatialReference(ref_sys)
+    poly = geometries.polygon_from_ring(ring, int(epsg))
+    if poly:
         return geometries.geometry_to_geojson(poly)
 
-    logging.error("Failed to import EPSG %s for las file %s", str(epsg), file_path)
+    logging.error('Failed to create bounding polygon with EPSG %s from las file "%s"', str(epsg), file_path)
     return None
