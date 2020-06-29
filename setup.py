@@ -7,8 +7,8 @@ with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
-    name="agpypeline",
-    version="0.0.9",
+    name="agp",
+    version="0.0.5",
     author="Jacob van der Leeuw",
     author_email="jvanderleeuw@email.arizona.edu",
     description="Installable package for entrypoint and drone-specific environment code within a transformer",
@@ -25,6 +25,6 @@ setuptools.setup(
     ],
     python_requires='>=3.7',
     install_requires=['setuptools', 'numpy', 'influxdb', 'laspy', 'requests>=2.21.0', 'python-dateutil', 'utm',
-                      'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography', 'pyyaml', 'pygdal==2.2.3.5']
+                      'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography', 'pyyaml', 'pygdal==2.4.4.*']
 
 )

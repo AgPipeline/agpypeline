@@ -10,7 +10,7 @@ from osgeo import ogr
 from osgeo import osr
 import liblas
 
-import agpypeline.geometries as geometries
+import agp.geometries as geometries
 
 
 def clip_las(las_path: str, clip_tuple: tuple, out_path: str) -> None:
