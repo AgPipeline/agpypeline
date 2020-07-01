@@ -53,10 +53,6 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Install system requirements
-        shell: bash
-        run: 'sudo apt-get install -y python3-gdal gdal-bin libgdal-dev gcc g++ python3.7-dev'
-        id: install-gdal-other-reqs
       - name: install setup.py
         run: python3 setup.py install
 
