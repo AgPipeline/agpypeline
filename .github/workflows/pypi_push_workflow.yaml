@@ -14,12 +14,11 @@ jobs:
         with:
           python-version: 3.7
       - name: Install setup.py
-        run: python3 -m pip install setup.py --user
+        run: python3 -m pip install pep517 --user
       - name: Build a binary wheel and a source tarball
-        run: python3 -m setup.py.build --source --binary --out-dir dist/
+        run: python3 -m pep517.build --source --binary --out-dir dist/
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
-
           password: ${{ secrets.test_pypi_password }}
           repository_url: https://pypi.org/project/agp/
