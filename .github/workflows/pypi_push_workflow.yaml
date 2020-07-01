@@ -42,7 +42,7 @@ jobs:
         id: install-gdal-other-reqs
       - name: Install Python numpy
         shell: bash
-        run: 'python3 -m pip install --upgrade --no-cache-dir numpy wheel '
+        run: 'python3 -m pip install --upgrade --no-cache-dir numpy wheel terrautils'
         id: install-python-numpy
       - name: Install Python pygdal
         shell: bash
