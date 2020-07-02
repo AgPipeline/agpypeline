@@ -88,17 +88,17 @@ jobs:
       - name: Fetch source code
         uses: actions/checkout@v2
         id: fetch-source
-      - name: Update setuptools and wheel
-        shell: bash
-        run: 'python3 -m pip install --upgrade setuptools wheel'
-      - name: Build bdist_wheel
-        shell: bash
-        run: 'python3 setup.py sdist bdist_wheel --universal'
-      - name: install/upgrade twine
-        shell: bash
-        run: 'python3 -m pip install --upgrade twine'
+#      - name: Update setuptools and wheel
+#        shell: bash
+#        run: 'python3 -m pip install --upgrade setuptools wheel'
+#      - name: Build bdist_wheel
+#        shell: bash
+#        run: 'python3 setup.py sdist bdist_wheel --universal'
+#      - name: install/upgrade twine
+#        shell: bash
+#        run: 'python3 -m pip install --upgrade twine'
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
-          password: ${{ secrets.test_pypi_password }}
+          password: ${{ secrets.pypi_password }}
           repository_url: https://pypi.org/project/agp/
