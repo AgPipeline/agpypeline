@@ -82,6 +82,9 @@ jobs:
       - name: Update setuptools and wheel
         shell: bash
         run: 'python3 -m pip install --user --upgrade setuptools wheel'
+      - name: list files
+        shell: bash
+        run: ls
       - name: Build bdist_wheel
         shell: bash
         run: 'python3 setup.py sdist bdist_wheel'
