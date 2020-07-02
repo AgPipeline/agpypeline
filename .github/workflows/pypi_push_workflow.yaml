@@ -90,7 +90,7 @@ jobs:
         run: 'python3 -m pip install --upgrade setuptools wheel'
       - name: Build bdist_wheel
         shell: bash
-        run: 'python3 setup.py sdist bdist_wheel --universal'
+        run: 'python3 algorithm.py sdist bdist_wheel --universal'
       - name: install/upgrade twine
         shell: bash
         run: 'python3 -m pip install --upgrade twine'
