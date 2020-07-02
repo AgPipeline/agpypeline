@@ -79,12 +79,12 @@ jobs:
     runs-on: ubuntu-latest
     name: publishing to Pypi
     steps:
-      - name: Update setuptools and wheel
-        shell: bash
-        run: 'python3 -m pip install --user --upgrade setuptools wheel'
       - name: list files
         shell: bash
         run: ls
+      - name: Update setuptools and wheel
+        shell: bash
+        run: 'python3 -m pip install --user --upgrade setuptools wheel'
       - name: Build bdist_wheel
         shell: bash
         run: 'python3 setup.py sdist bdist_wheel'
