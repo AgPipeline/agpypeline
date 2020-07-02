@@ -79,18 +79,21 @@ jobs:
     runs-on: ubuntu-latest
     name: publishing to Pypi
     steps:
-      - name: list files
-        shell: bash
-        run: ls
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: upgrade pip
+        run: python3 -m pip install --upgrade pip
       - name: Update setuptools and wheel
         shell: bash
-        run: 'python3 -m pip install --user --upgrade setuptools wheel'
+        run: 'python3 -m pip install --upgrade setuptools wheel'
       - name: Build bdist_wheel
         shell: bash
-        run: 'python3 setup.py sdist bdist_wheel'
+        run: 'python3 setup.py sdist bdist_wheel --universal'
       - name: install/upgrade twine
         shell: bash
-        run: 'python3 -m pip install --user --upgrade twine'
+        run: 'python3 -m pip install --upgrade twine'
       - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
