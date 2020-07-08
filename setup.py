@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="agp",
-    version="0.0.21",
+    version="0.0.22",
     author="Jacob van der Leeuw",
     author_email="jvanderleeuw@email.arizona.edu",
     description="Installable package for entrypoint and drone-specific environment code within a transformer",
