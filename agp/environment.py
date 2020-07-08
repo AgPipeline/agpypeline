@@ -7,7 +7,7 @@ import logging
 from typing import Optional, Union
 import piexif
 
-from agpypeline.configuration import Configuration
+from agp.configuration import Configuration
 
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp

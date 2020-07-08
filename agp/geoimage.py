@@ -11,7 +11,7 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 
-import agpypeline.geometries as geometries
+import agp.geometries as geometries
 
 
 def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress: bool = True) -> Optional[np.ndarray]:
