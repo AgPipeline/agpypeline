@@ -9,9 +9,9 @@ import os
 from typing import Optional
 import yaml
 
-from agp.algorithm import Algorithm
-from agp.environment import Environment
-from agp.configuration import Configuration
+from agpypeline.algorithm import Algorithm
+from agpypeline.environment import Environment
+from agpypeline.configuration import Configuration
 
 
 class __internal__:

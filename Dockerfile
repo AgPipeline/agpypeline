@@ -47,7 +47,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install the library
-COPY agp /tmp/agpypeline/agpypeline
+COPY agpypeline /tmp/agpypeline/agpypeline
 COPY setup.py README.md /tmp/agpypeline/
 RUN python3 -m pip install --upgrade /tmp/agpypeline && \
     rm -r /tmp/agpypeline
