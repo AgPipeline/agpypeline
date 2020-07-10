@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - testing
 jobs:
   publish:
     runs-on: ubuntu-latest
