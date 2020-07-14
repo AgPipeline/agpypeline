@@ -36,7 +36,7 @@ RUN apt-get update && \
     python3 -m pip install --upgrade --no-cache-dir \
         numpy && \
     python3 -m pip install --upgrade --no-cache-dir \
-        pygdal==2.2.3.5 && \
+        pygdal==3.1.1.6 && \
     apt-get remove -y \
         libgdal-dev \
         gcc \
