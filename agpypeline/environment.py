@@ -1,22 +1,13 @@
-"""Class instance for Transformer
+"""Defines the Transformer's Environment
 """
 
 import argparse
 import datetime
 import logging
-import os
-import sys
-
-from importlib import import_module
+from typing import Optional, Union
 import piexif
 
-
-from numpy import nan
-from osgeo import gdal, osr
-
-path = os.path.abspath(os.path.join(os.path.dirname(os.getcwd()), '..'))
-sys.path.insert(0, path)
-configuration = import_module('configuration')
+from agpypeline.configuration import Configuration
 
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
@@ -24,7 +15,7 @@ EXIF_TIMESTAMP_OFFSET = 36881  # Timestamp UTC offset (general)
 EXIF_ORIGIN_TIMESTAMP_OFFSET = 36881  # Capture timestamp UTC offset
 
 
-class __internal__():
+class __internal__:
     """Class containing functions for this file only
     """
 
@@ -33,23 +24,23 @@ class __internal__():
         """
 
     @staticmethod
-    def exif_tags_to_timestamp(exif_tags):
+    def exif_tags_to_timestamp(exif_tags: dict) -> Optional[datetime.datetime]:
         """Looks up the origin timestamp and a timestamp offset in the exit tags and returns
            a datetime object
         Args:
-            exif_tags(dict): The exif tags to search for timestamp information
+            exif_tags: The exif tags to search for timestamp information
         Return:
             Returns the origin timestamp when found. The return timestamp is adjusted for UTF if
             an offset is found. None is returned if a valid timestamp isn't found.
         """
         cur_stamp, cur_offset = (None, None)
 
-        def convert_and_clean_tag(value):
+        def convert_and_clean_tag(value: Union[str, bytes]) -> Optional[str]:
             """Internal helper function for handling EXIF tag values. Tests for an empty string after
                stripping colons, '+', '-', and whitespace [the spec is unclear if a +/- is needed when
                the timestamp offset is unknown (and spaces are used)].
             Args:
-                value(bytes or str): The tag value
+                value: The tag value
             Return:
                 Returns the cleaned up, and converted from bytes, string. Or None if the value is empty
                 after stripping above characters and whitespace.
@@ -121,78 +112,20 @@ class __internal__():
         return timestamp
 
 
-class Transformer():
-    """Generic class for supporting transformers
+class Environment:
+    """Generic class for supporting transformer environments
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, configuration: Configuration, **kwargs):
         """Performs initialization of class instance
         Arguments:
+            configuration: configuration information for the current transformer instance
             kwargs: additional parameters passed in to Transformer
         """
         # pylint: disable=unused-argument
         self.sensor = None
         self.args = None
-
-
-    @property
-    def default_epsg(self) -> int:
-        """Returns the current working EPSG code
-        """
-        return 4326
-
-    @property
-    def supported_image_file_exts(self):
-        """Returns the list of supported image file extension strings (in lower case)
-        """
-        return ['tif', 'tiff', 'jpg']
-
-    def get_image_file_epsg(self, source_path: str) -> str:
-        """Returns the EPSG of the georeferenced image file
-        Arguments:
-            source_path: the path to the image to load the EPSG code from
-        Return:
-            Returns the EPSG code loaded from the file. None is returned if there is a problem or the file
-            doesn't have an EPSG code
-        """
-        # pylint: disable=no-self-use
-        try:
-            src = gdal.Open(source_path)
-
-            proj = osr.SpatialReference(wkt=src.GetProjection())
-
-            return proj.GetAttrValue('AUTHORITY', 1)
-        except Exception as ex:
-            logging.debug("[get_image_file_epsg] Exception caught: %s", str(ex))
-
-        return None
-
-    def get_image_file_geobounds(self, source_path: str) -> list:
-        """Uses gdal functionality to retrieve rectilinear boundaries from the file
-        Args:
-            source_path(str): path of the file to get the boundaries from
-        Returns:
-            The upper-left and calculated lower-right boundaries of the image in a list upon success.
-            The values are returned in following order: min_y, max_y, min_x, max_x. A list of numpy.nan
-            is returned if the boundaries can't be determined
-        """
-        # pylint: disable=no-self-use
-        try:
-            src = gdal.Open(source_path)
-            ulx, xres, _, uly, _, yres = src.GetGeoTransform()
-            lrx = ulx + (src.RasterXSize * xres)
-            lry = uly + (src.RasterYSize * yres)
-
-            min_y = min(uly, lry)
-            max_y = max(uly, lry)
-            min_x = min(ulx, lrx)
-            max_x = max(ulx, lrx)
-
-            return [min_y, max_y, min_x, max_x]
-        except Exception as ex:
-            logging.debug("[get_image_file_geobounds] Exception caught: %s", str(ex))
-
-        return [nan, nan, nan, nan]
+        self.configuration = configuration
 
     def generate_transformer_md(self) -> dict:
         """Generates metadata about this transformer
@@ -201,11 +134,11 @@ class Transformer():
         """
         # pylint: disable=no-self-use
         return {
-            'version': configuration.TRANSFORMER_VERSION,
-            'name': configuration.TRANSFORMER_NAME,
-            'author': configuration.AUTHOR_NAME,
-            'description': configuration.TRANSFORMER_DESCRIPTION,
-            'repository': {'repUrl': configuration.REPOSITORY}
+            'version': self.configuration.transformer_version,
+            'name': self.configuration.transformer_name,
+            'author': self.configuration.author_name,
+            'description': self.configuration.transformer_description,
+            'repository': {'repUrl': self.configuration.repository}
         }
 
     def add_parameters(self, parser: argparse.ArgumentParser) -> None:
@@ -214,8 +147,8 @@ class Transformer():
             parser: instance of argparse
         """
         # pylint: disable=no-self-use
-        parser.epilog = configuration.TRANSFORMER_NAME + ' version ' + configuration.TRANSFORMER_VERSION + \
-                        ' author ' + configuration.AUTHOR_NAME + ' ' + configuration.AUTHOR_EMAIL
+        parser.epilog = str(self.configuration.transformer_name) + ' version ' + str(self.configuration.transformer_version) +\
+                        ' author ' + str(self.configuration.author_name) + ' ' + str(self.configuration.author_email)
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
         """Returns a parameter list for processing data
@@ -252,11 +185,11 @@ class Transformer():
                 experiment_name = parse_md['studyName']
 
             # Check for transformer specific metadata
-            if configuration.TRANSFORMER_NAME in parse_md:
-                if isinstance(parse_md[configuration.TRANSFORMER_NAME], list):
-                    transformer_md.extend(parse_md[configuration.TRANSFORMER_NAME])
+            if self.configuration.transformer_name in parse_md:
+                if isinstance(parse_md[self.configuration.transformer_name], list):
+                    transformer_md.extend(parse_md[self.configuration.transformer_name])
                 else:
-                    transformer_md.append(parse_md[configuration.TRANSFORMER_NAME])
+                    transformer_md.append(parse_md[self.configuration.transformer_name])
         # Get the list of files, if there are some and find the earliest timestamp if a timestamp
         # hasn't been specified yet
         file_list = []
@@ -273,7 +206,6 @@ class Transformer():
             timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
 
         # Prepare our parameters
-
         check_md = {'timestamp': timestamp,
                     'season': season_name,
                     'experiment': experiment_name,
@@ -285,6 +217,7 @@ class Transformer():
                     'list_files': lambda: file_list
                     }
 
+        # Return dictionary of parameters for Algorithm class nethod calls
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
