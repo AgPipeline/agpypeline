@@ -51,22 +51,7 @@ COPY agpypeline /tmp/agpypeline/agpypeline
 COPY setup.py README.md /tmp/agpypeline/
 
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        python3-gdal \
-        gdal-bin   \
-        libgdal-dev  \
-        gcc \
-        g++ \
-        python3.7-dev && \
-        python3 -m pip install --upgrade --no-cache-dir pygdal==2.2.3.* && \
-        python3 -m pip install --upgrade /tmp/agpypeline && \
-    rm -r /tmp/agpypeline && \
-    apt-get remove -y \
-        libgdal-dev \
-        gcc \
-        g++ \
-        python3-dev && \
-    apt-get autoremove -y
+RUN python3 -m pip install --upgrade --no-cache-dir pygdal==2.2.3.* && \
+    python3 -m pip install --upgrade /tmp/agpypeline
 
 USER extractor
