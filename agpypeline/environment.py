@@ -160,7 +160,7 @@ class Environment:
         # pylint: disable=too-many-branches
         self.args = args
 
-        timestamp, season_name, experiment_name = None, None, None
+        timestamp, season_name, experiment_name = None, "Season Unknown", "Experiment Unknown"
         parsed_metadata = []
         transformer_md = []
 
@@ -217,7 +217,7 @@ class Environment:
                     'list_files': lambda: file_list
                     }
 
-        # Return dictionary of parameters for Algorithm class nethod calls
+        # Return dictionary of parameters for Algorithm class method calls
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
