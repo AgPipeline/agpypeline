@@ -36,7 +36,7 @@ RUN apt-get update && \
     python3 -m pip install --upgrade --no-cache-dir \
         numpy && \
     python3 -m pip install --upgrade --no-cache-dir \
-        pygdal==2.2.3.5 && \
+        pygdal==2.2.3.* && \
     apt-get remove -y \
         libgdal-dev \
         gcc \
@@ -49,7 +49,9 @@ RUN apt-get update && \
 # Install the library
 COPY agpypeline /tmp/agpypeline/agpypeline
 COPY setup.py README.md /tmp/agpypeline/
-RUN python3 -m pip install --upgrade /tmp/agpypeline && \
-    rm -r /tmp/agpypeline
+
+
+RUN python3 -m pip install --upgrade --no-cache-dir pygdal==2.2.3.* && \
+    python3 -m pip install --upgrade /tmp/agpypeline
 
 USER extractor

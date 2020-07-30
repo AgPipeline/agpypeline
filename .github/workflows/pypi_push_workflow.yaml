@@ -2,27 +2,31 @@ on:
   push:
     branches:
       - master
-
 jobs:
   publish:
     runs-on: ubuntu-latest
     name: publishing to Pypi
     steps:
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: upgrade pip
+        run: python3 -m pip install --upgrade pip
+      - name: Fetch source code
+        uses: actions/checkout@v2
+        id: fetch-source
       - name: Update setuptools and wheel
         shell: bash
-        run: 'python3 -m pip install --user --upgrade setuptools wheel'
+        run: 'python3 -m pip install --upgrade setuptools wheel'
       - name: Build bdist_wheel
         shell: bash
-        run: 'python3 setup.py sdist bdist_wheel'
+        run: 'python3 setup.py sdist bdist_wheel --universal'
       - name: install/upgrade twine
         shell: bash
-        run: 'python3 -m pip install --user --upgrade twine'
-      - name: run twine
-        shell: bash
-        run: 'python3 -m twine upload dist/*'
-      - name: input username
-        shell: bash
-        run: secrets.PYPI_USERNAME
-      - name: input password
-        shell: bash
-        run: secrets.PYPI_PASSWORD
+        run: 'python3 -m pip install --upgrade twine'
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.pypi_password }}
+          repository_url: https://upload.pypi.org/legacy/
