@@ -390,6 +390,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     # Create an instance of the Transformer class
     transformer_instance = Environment(configuration_info, **kwargs)
     if not transformer_instance:
+        print("REACHING 1")
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)
 
@@ -413,7 +414,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
         result_path = os.path.join(args.working_space, 'result.json')
     else:
         result_path = None
-
+    print("REACHING 2" + str(result_path))
     __internal__.handle_result(result, args.result, result_path)
     return result
 
