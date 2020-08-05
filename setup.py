@@ -7,8 +7,8 @@ with open("README.md", "r") as fh:
     LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
-    name="agpypeline",
-    version="0.0.40",
+    name="agpy",
+    version="0.0.42",
     author="Jacob van der Leeuw",
     author_email="jvanderleeuw@email.arizona.edu",
     description="Installable package for entrypoint and drone-specific environment code within a transformer",

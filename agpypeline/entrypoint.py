@@ -360,16 +360,18 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
                         help='Direct the result of a run to one or more of (all is default): "all,file,print"')
 
     parser.add_argument('--metadata', type=str, action='append', help='The path to the source metadata')
-
+    print("REACHING 3")
     parser.add_argument('--working_space', type=str,
                         help='the folder to use use as a workspace and for storing results')
 
     # Let the transformer class add parameters
     if hasattr(environment_instance, 'add_parameters'):
+        print("REACHING 4")
         environment_instance.add_parameters(parser)
 
     # Check if the transformer has a function defined to extend command line arguments
     if hasattr(algorithm_instance, 'add_parameters'):
+        print("REACHING 5")
         algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
