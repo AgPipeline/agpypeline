@@ -149,11 +149,6 @@ class __internal__:
             if isinstance(configuration_info.metadata_needed, str):
                 if configuration_info.metadata_needed.lower().strip() == 'true':
                     return True
-            # if not configuration_info.metadata_needed:
-            #     return False
-            # if isinstance(configuration_info.metadata_needed, str):
-            #     if configuration_info.metadata_needed.lower().strip() == 'false':
-            #         return False
         return False
 
     @staticmethod
@@ -360,18 +355,16 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
                         help='Direct the result of a run to one or more of (all is default): "all,file,print"')
 
     parser.add_argument('--metadata', type=str, action='append', help='The path to the source metadata')
-    print("REACHING 3")
+
     parser.add_argument('--working_space', type=str,
                         help='the folder to use use as a workspace and for storing results')
 
     # Let the transformer class add parameters
     if hasattr(environment_instance, 'add_parameters'):
-        print("REACHING 4")
         environment_instance.add_parameters(parser)
 
     # Check if the transformer has a function defined to extend command line arguments
     if hasattr(algorithm_instance, 'add_parameters'):
-        print("REACHING 5")
         algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
@@ -392,7 +385,6 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     # Create an instance of the Transformer class
     transformer_instance = Environment(configuration_info, **kwargs)
     if not transformer_instance:
-        print("REACHING 1")
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)
 
@@ -405,7 +397,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     # Check that we have mandatory metadata
     if not args.metadata and __internal__.check_metadata_needed(configuration_info):
         result = __internal__.handle_error(-1, "No metadata paths were specified.")
-    if args.metadata:
+    elif args.metadata:
         md_results = __internal__.load_metadata_files(args.metadata)
         if 'metadata' in md_results:
             result = __internal__.perform_processing(transformer_instance, algorithm_instance, args, md_results['metadata'])
@@ -416,7 +408,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
         result_path = os.path.join(args.working_space, 'result.json')
     else:
         result_path = None
-    print("REACHING 2" + str(result_path))
+
     __internal__.handle_result(result, args.result, result_path)
     return result
 
