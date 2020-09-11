@@ -54,6 +54,17 @@ class __internal__:
             else:
                 value = value.strip()
 
+            split_char = None
+            if " " in value:
+                partial = value.split("")
+                split_char = ""
+            elif "T" in value:
+                partial = value.split("T")
+                split_char = "T"
+            if split_char is not None:
+                partial_first = partial[0].replace(":", "-")
+                value = partial_first + split_char + partial[1]
+
             # Check for an empty string after stripping colons
             if value:
                 if not value.replace(":", "").replace("+:", "").replace("-", "").strip():
@@ -147,7 +158,8 @@ class Environment:
             parser: instance of argparse
         """
         # pylint: disable=no-self-use
-        parser.epilog = str(self.configuration.transformer_name) + ' version ' + str(self.configuration.transformer_version) +\
+        parser.epilog = str(self.configuration.transformer_name) + ' version ' + str(
+            self.configuration.transformer_version) + \
                         ' author ' + str(self.configuration.author_name) + ' ' + str(self.configuration.author_email)
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
