@@ -77,7 +77,7 @@ jobs:
         if: ${{ matrix.app == 'pylint' }}
         run: wget https://raw.githubusercontent.com/AgPipeline/Organization-info/master/pylint.rc
       - name: Set execution permission for testing
-        run: chmod +x algorithm_rgb.py testing.py
+        run: chmod +x tests/test_agpypeline.py
       - name: Listing
         run: ls -la
       - name: Files to be tested
