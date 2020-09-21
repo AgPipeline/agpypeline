@@ -6,11 +6,15 @@ Notes:
     This file assumes it's in a subfolder off the main folder
 """
 import argparse
-import datetime
 import json
+import numpy as np
 import os
 import piexif
-import subprocess
+
+from numpy import nan
+from liblas.header import Header
+from osgeo import gdal, ogr, osr
+from shapely.geometry import Point, LineString, MultiPoint
 
 from agpypeline import algorithm
 from agpypeline import configuration
@@ -19,11 +23,7 @@ from agpypeline import environment
 from agpypeline import geoimage
 from agpypeline import geometries
 from agpypeline import lasfile
-import numpy as np
-from numpy import nan
-from liblas.header import Header
-from osgeo import gdal, ogr, osr
-from shapely.geometry import Point, LineString, MultiPoint
+
 
 TEST_FILES = ['agpypeline/algorithm.py', 'agpypeline/configuration.py',
               'agpypeline/entrypoint.py', 'agpypeline/environment.py', 'agpypeline/geoimage.py',
@@ -86,10 +86,10 @@ def test_entrypoint_load_metadata():
     bad_result = entry.load_metadata("")
     assert bad_result == {'error': "Unable to load metadata file ''"}
     result = entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json")
-    same = False
-    if orig == result:
-        same = True
-    assert same is True
+    with open("data/entrypoint_load_metadata.json", 'w') as outfile:
+        json.dump(str(result), outfile)
+    new = json.load(open("data/entrypoint_load_metadata.json"))
+    assert orig == new
 
 
 def test_entrypoint_check_params_result_error():
@@ -415,10 +415,10 @@ def test_geometries_geometry_to_tuples():
 def test_geometries_geojson_to_tuples():
     """Tests geojson_to_tuples by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
-    f = json.load(open(JSON_FILE, 'r'))
+    loaded_file = json.load(open(JSON_FILE, 'r'))
     checkfile = json.load(open("data/geojson_to_tuples.json", 'r'))
-    for feature in range(len(f["features"])):
-        check_bounds = f["features"][feature]["geometry"]
+    for feature in range(len(loaded_file["features"])):
+        check_bounds = loaded_file["features"][feature]["geometry"]
         result = geometries.geojson_to_tuples(check_bounds)
         assert tuple(checkfile[str(feature)]) == result
 
@@ -426,10 +426,10 @@ def test_geometries_geojson_to_tuples():
 def test_geometries_geometry_to_geojson():
     """Tests geometry_to_geojson by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
-    f = json.load(open(JSON_FILE, 'r'))
+    loaded_file = json.load(open(JSON_FILE, 'r'))
     checkfile = json.load(open("data/geometry_to_geojson.json", 'r'))
-    for feature in range(len(f["features"])):
-        check_bounds = f["features"][feature]["geometry"]
+    for feature in range(len(loaded_file["features"])):
+        check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
         result = geometries.geometry_to_geojson(geometry)
         assert checkfile[str(feature)] == result
