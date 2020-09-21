@@ -417,7 +417,7 @@ def test_geometries_geojson_to_tuples():
     for feature in range(len(loaded_file["features"])):
         check_bounds = str(loaded_file["features"][feature]["geometry"])
         result = geometries.geojson_to_tuples(check_bounds)
-        assert eval(checkfile[str(feature)]) == result
+        assert checkfile[str(feature)] == str(result)
 
 
 def test_geometries_geometry_to_geojson():
