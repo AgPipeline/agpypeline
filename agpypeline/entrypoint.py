@@ -423,5 +423,10 @@ def entrypoint(configuration_info: Configuration, algorithm_instance: Algorithm)
 
 
 def begin_process(configuration_info: Configuration, algorithm_instance: Algorithm):
+    """entrypoint() functionality moved here to allow users to transition over time
+    Arguments:
+        configuration_info: an instance of the Configuration class
+        algorithm_instance: an instance of class for preparing work
+    """
     parser = argparse.ArgumentParser(description=configuration_info.transformer_description)
     do_work(parser, configuration_info, algorithm_instance)

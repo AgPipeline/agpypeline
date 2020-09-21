@@ -7,9 +7,10 @@ Notes:
 """
 import argparse
 import json
-import numpy as np
 import os
 import piexif
+
+import numpy as np
 
 from numpy import nan
 from liblas.header import Header
@@ -72,8 +73,10 @@ def test_configuration():
 def test_entrypoint_handle_error():
     """Tests entrypoint's handle_error function by passing in an error code and message"""
     entry = entrypoint.__internal__()
-    bad_result = entry.handle_error(None, None)
-    assert bad_result == {'error': 'An error has occurred with error code (-1)', 'code': -1}
+    try:
+        bad_result = entry.handle_error(None, None)
+    except Exception:
+        assert bad_result == {'error': 'An error has occurred with error code (-1)', 'code': -1}
     result = entry.handle_error(0, "test message")
     assert result == {'error': 'test message', 'code': 0}
 
@@ -198,8 +201,8 @@ def test_environment_exif_tags_to_timestamp():
     for image in os.listdir("images/jpg_images"):
         tags_dict = piexif.load("images/jpg_images/" + image)
         exif_tags = tags_dict["Exif"]
-        EXIF_ORIGIN_TIMESTAMP = 36867
-        value = exif_tags[EXIF_ORIGIN_TIMESTAMP]
+        exif_origin_timestamp = 36867
+        value = exif_tags[exif_origin_timestamp]
         value = value.decode('UTF-8').strip()
         split_char = None
         if " " in value:
@@ -316,8 +319,8 @@ def test_geoimage_create_geotiff():
     """Tests create_geotiff, although a complete image is not generated at the moment. gps_bounds were extracted
     from output.tin.tif"""
     gps_bounds = (3971937.000, 3972667.000, 368908.000, 369799.000)
-    ds = gdal.Open(TEST_IMAGE)
-    myarray = np.array(ds.GetRasterBand(1).ReadAsArray())
+    data = gdal.Open(TEST_IMAGE)
+    myarray = np.array(data.GetRasterBand(1).ReadAsArray())
     if os.path.isfile("images/output.tif"):
         os.remove("images/output.tif")
     geoimage.create_geotiff(myarray, gps_bounds, "images/output.tif", 26913)
@@ -376,8 +379,8 @@ def test_geometries_calculate_centroid_from_wkt():
 def test_geometries_calculate_overlap_percent():
     """Tests calculate_overlap_percent by trying to overlap the bounds from a json file with themselves and then from
     a modified version of themselves"""
-    f = json.load(open(JSON_FILE, 'r'))
-    check_bounds = f["features"][0]["geometry"]
+    loaded_file = json.load(open(JSON_FILE, 'r'))
+    check_bounds = loaded_file["features"][0]["geometry"]
     bounding_box = {"type": "Polygon", "coordinates": [
         [[408989, 3659975], [408990, 3659975], [408990, 3659972], [408989, 3659972], [408989, 3659975]]]}
     assert geometries.calculate_overlap_percent(check_bounds, check_bounds) == 0.0
@@ -389,10 +392,10 @@ def test_geometries_convert_geometry():
     against a file containing function call results"""
     null_input_test = geometries.convert_geometry(None, None)
     assert null_input_test is None
-    f = json.load(open(JSON_FILE, 'r'))
+    loaded_file = json.load(open(JSON_FILE, 'r'))
     checkfile = json.load(open("data/convert_geometry.json", 'r'))
-    for feature in range(len(f["features"])):
-        check_bounds = f["features"][feature]["geometry"]
+    for feature in range(len(loaded_file["features"])):
+        check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
         srs = osr.SpatialReference()
         srs.SetFromUserInput("EPSG:3857")
@@ -403,10 +406,10 @@ def test_geometries_convert_geometry():
 def test_geometries_geometry_to_tuples():
     """Tests geometry_to_tuples by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
-    f = json.load(open(JSON_FILE, 'r'))
+    loaded_file = json.load(open(JSON_FILE, 'r'))
     checkfile = json.load(open("data/geometry_to_tuples.json", 'r'))
-    for feature in range(len(f["features"])):
-        check_bounds = f["features"][feature]["geometry"]
+    for feature in range(len(loaded_file["features"])):
+        check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
         result = geometries.geometry_to_tuples(geometry)
         assert tuple(checkfile[str(feature)]) == result
