@@ -41,7 +41,7 @@ def test_exists():
     """Tests if the files stored in variables above are accessible/contained"""
     for file in TEST_FILES:
         assert os.path.isfile(file)
-    assert os.path.isfile(JSON_FILE) and os.path.isfile(TEST_IMAGE) and os.path.isfile(TEST_METADATA)
+    assert os.path.isfile(TEST_IMAGE) and os.path.isfile(TEST_METADATA)
 
 
 # Other methods can be used here if wanted in order to test if the error is raised, but this would
@@ -83,14 +83,10 @@ def test_entrypoint_load_metadata():
     """Tests entrypoint's load_metadata function by seeing if the result is the same as a previously called valid
     result"""
     entry = entrypoint.__internal__()
-    orig = json.load(open("data/entrypoint_load_metadata_files.json"))
+    orig = json.load(open("data/entrypoint_load_metadata_orig.json"))
     bad_result = entry.load_metadata("")
     assert bad_result == {'error': "Unable to load metadata file ''"}
-    result = entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json")
-    with open("data/entrypoint_load_metadata.json", 'w') as outfile:
-        json.dump(str(result), outfile)
-    new = json.load(open("data/entrypoint_load_metadata.json"))
-    assert orig == new
+    assert entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json") == orig
 
 
 def test_entrypoint_check_params_result_error():
@@ -381,7 +377,7 @@ def test_geometries_calculate_overlap_percent():
     check_bounds = loaded_file["features"][0]["geometry"]
     bounding_box = {"type": "Polygon", "coordinates": [
         [[408989, 3659975], [408990, 3659975], [408990, 3659972], [408989, 3659972], [408989, 3659975]]]}
-    assert geometries.calculate_overlap_percent(check_bounds, check_bounds) == 0.0
+    assert geometries.calculate_overlap_percent(check_bounds, check_bounds) == 1.0
     assert round(geometries.calculate_overlap_percent(check_bounds, bounding_box), 4) == 0.7591
 
 
@@ -419,9 +415,9 @@ def test_geometries_geojson_to_tuples():
     loaded_file = json.load(open(JSON_FILE, 'r'))
     checkfile = json.load(open("data/geojson_to_tuples.json", 'r'))
     for feature in range(len(loaded_file["features"])):
-        check_bounds = loaded_file["features"][feature]["geometry"]
+        check_bounds = str(loaded_file["features"][feature]["geometry"])
         result = geometries.geojson_to_tuples(check_bounds)
-        assert tuple(checkfile[str(feature)]) == result
+        assert eval(checkfile[str(feature)]) == result
 
 
 def test_geometries_geometry_to_geojson():
