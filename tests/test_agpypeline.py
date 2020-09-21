@@ -200,7 +200,7 @@ def test_environment_exif_tags_to_timestamp():
         value = value.decode('UTF-8').strip()
         split_char = None
         if " " in value:
-            partial = value.split(" ")
+            partial = value.split()
             split_char = " "
         elif "T" in value:
             partial = value.split("T")
