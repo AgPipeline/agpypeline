@@ -196,20 +196,6 @@ def test_environment_exif_tags_to_timestamp():
         if image != ".DS_Store":
             tags_dict = piexif.load("images/jpg_images/" + image)
             exif_tags = tags_dict["Exif"]
-            exif_origin_timestamp = 36867
-            value = exif_tags[exif_origin_timestamp]
-            value = value.decode('UTF-8').strip()
-            split_char = None
-            if " " in value:
-                partial = value.split()
-                split_char = " "
-            elif "T" in value:
-                partial = value.split("T")
-                split_char = "T"
-            if split_char:
-                partial_first = partial[0].replace(":", "-")
-                value = partial_first + split_char + partial[1]
-                exif_tags[exif_origin_timestamp] = value
             result = environ.exif_tags_to_timestamp(exif_tags)
             arr.append(result)
     with open("data/exif_tags_to_timestamp.txt", 'r') as checkfile:
