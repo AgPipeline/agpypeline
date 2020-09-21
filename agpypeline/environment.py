@@ -56,8 +56,8 @@ class __internal__:
 
             split_char = None
             if " " in value:
-                partial = value.split("")
-                split_char = ""
+                partial = value.split()
+                split_char = " "
             elif "T" in value:
                 partial = value.split("T")
                 split_char = "T"

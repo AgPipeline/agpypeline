@@ -193,24 +193,25 @@ def test_environment_exif_tags_to_timestamp():
     environ = environment.__internal__()
     assert environ.exif_tags_to_timestamp({}) is None
     for image in os.listdir("images/jpg_images"):
-        tags_dict = piexif.load("images/jpg_images/" + image)
-        exif_tags = tags_dict["Exif"]
-        exif_origin_timestamp = 36867
-        value = exif_tags[exif_origin_timestamp]
-        value = value.decode('UTF-8').strip()
-        split_char = None
-        if " " in value:
-            partial = value.split()
-            split_char = " "
-        elif "T" in value:
-            partial = value.split("T")
-            split_char = "T"
-        if split_char:
-            partial_first = partial[0].replace(":", "-")
-            value = partial_first + split_char + partial[1]
-            exif_tags[exif_origin_timestamp] = value
-        result = environ.exif_tags_to_timestamp(exif_tags)
-        arr.append(result)
+        if image != ".DS_Store":
+            tags_dict = piexif.load("images/jpg_images/" + image)
+            exif_tags = tags_dict["Exif"]
+            exif_origin_timestamp = 36867
+            value = exif_tags[exif_origin_timestamp]
+            value = value.decode('UTF-8').strip()
+            split_char = None
+            if " " in value:
+                partial = value.split()
+                split_char = " "
+            elif "T" in value:
+                partial = value.split("T")
+                split_char = "T"
+            if split_char:
+                partial_first = partial[0].replace(":", "-")
+                value = partial_first + split_char + partial[1]
+                exif_tags[exif_origin_timestamp] = value
+            result = environ.exif_tags_to_timestamp(exif_tags)
+            arr.append(result)
     with open("data/exif_tags_to_timestamp.txt", 'r') as checkfile:
         assert str(arr) == checkfile.read()
 
@@ -220,9 +221,12 @@ def test_environment_get_first_timestamp():
     check the result when not having a timestamp included and when having a timestamp included"""
     environ = environment.__internal__()
     no_timestamp_res = environ.get_first_timestamp("images/jpg_images/DJI_0340.JPG")
-    assert no_timestamp_res is None
-    timestamp_res = environ.get_first_timestamp("images/jpg_images/DJI_0340.JPG", '2020-12-31')
-    assert timestamp_res == "2020-12-31T00:00:00"
+    assert no_timestamp_res == "2018-05-22T09:42:30"
+    later_timestamp_res = environ.get_first_timestamp("images/jpg_images/DJI_0340.JPG", '2020-12-31')
+    assert later_timestamp_res == "2018-05-22T09:42:30"
+    earlier_timestamp_res = environ.get_first_timestamp("images/jpg_images/DJI_0340.JPG", '2000-12-31')
+    assert earlier_timestamp_res == "2000-12-31T00:00:00"
+
 
 
 def test_environment_environment():
