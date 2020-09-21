@@ -73,10 +73,8 @@ def test_configuration():
 def test_entrypoint_handle_error():
     """Tests entrypoint's handle_error function by passing in an error code and message"""
     entry = entrypoint.__internal__()
-    try:
-        bad_result = entry.handle_error(None, None)
-    except Exception:
-        assert bad_result == {'error': 'An error has occurred with error code (-1)', 'code': -1}
+    bad_result = entry.handle_error(None, None)
+    assert bad_result == {'error': 'An error has occurred with error code (-1)', 'code': -1}
     result = entry.handle_error(0, "test message")
     assert result == {'error': 'test message', 'code': 0}
 
