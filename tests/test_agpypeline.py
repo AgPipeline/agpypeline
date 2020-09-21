@@ -212,7 +212,7 @@ def test_environment_exif_tags_to_timestamp():
         if split_char:
             partial_first = partial[0].replace(":", "-")
             value = partial_first + split_char + partial[1]
-            exif_tags[EXIF_ORIGIN_TIMESTAMP] = value
+            exif_tags[exif_origin_timestamp] = value
         result = environ.exif_tags_to_timestamp(exif_tags)
         arr.append(result)
     with open("data/exif_tags_to_timestamp.txt", 'r') as checkfile:

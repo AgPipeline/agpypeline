@@ -2,3 +2,4 @@ liblas
 PyYAML
 numpy
 piexif
+shapely
