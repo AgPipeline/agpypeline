@@ -388,21 +388,24 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)
 
-    add_parameters(parser, transformer_instance, algorithm_instance)
+    add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
 
     # start logging system
     logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)
 
-    # Check that we have mandatory metadata
+    # Check that we have metadata
     if not args.metadata and __internal__.check_metadata_needed(configuration_info):
         result = __internal__.handle_error(-1, "No metadata paths were specified.")
     elif args.metadata:
         md_results = __internal__.load_metadata_files(args.metadata)
-        if 'metadata' in md_results:
-            result = __internal__.perform_processing(transformer_instance, algorithm_instance, args, md_results['metadata'])
-        else:
+        if 'metadata' not in md_results:
             result = __internal__.handle_error(-3, md_results['error'])
+    else:
+        md_results = {'metadata': []}
+
+    if not result:
+        result = __internal__.perform_processing(transformer_instance, algorithm_instance, args, md_results['metadata'])
 
     if args.working_space:
         result_path = os.path.join(args.working_space, 'result.json')
