@@ -5,13 +5,13 @@ Author : Chris Schnaufer <schnaufer@arizona.edu>
 Notes:
     This file assumes it's in a subfolder off the main folder
 """
-import json
-import subprocess
-
-from liblas import file
-from liblas.header import Header
-
-from agpypeline import lasfile
+# import json
+# import subprocess
+#
+# from liblas import file
+# from liblas.header import Header
+#
+# from agpypeline import lasfile
 
 
 # def test_get_las_epsg_from_header():  # More tests might be needed in order to know if it works for a non-null epsg
