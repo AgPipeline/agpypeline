@@ -388,7 +388,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)
 
-    add_parameters(parser, transformer_instance, algorithm_instance)
+    add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
 
     # start logging system
