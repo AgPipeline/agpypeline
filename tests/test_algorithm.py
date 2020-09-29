@@ -28,4 +28,4 @@ def test_algorithm():
     except RuntimeError as error:
         assert str(error) == "The Algorithm class method perform_process() must be overridden by a derived class"
     else:
-        assert type(res) == dict
+        assert isinstance(res, dict)

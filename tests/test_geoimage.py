@@ -6,11 +6,11 @@ Notes:
     This file assumes it's in a subfolder off the main folder
 """
 import json
-import numpy as np
 import os
-
+import subprocess
+import numpy as np
 from numpy import nan
-from osgeo import gdal, ogr, osr
+from osgeo import gdal, ogr
 
 from agpypeline import geoimage, geometries
 
@@ -93,6 +93,13 @@ def test_geoimage_create_geotiff():
         os.remove("images/output.tif")
     geoimage.create_geotiff(myarray, gps_bounds, out_path="images/geoimage_create_geotiff.tif", srid=26913,
                             nodata=-9999)
+    check_output = subprocess.check_output(['gdalinfo', 'images/geoimage_create_geotiff_orig.tif']).decode("utf-8")
+    check_output_lines = check_output.splitlines()
+    orig_out = check_output_lines[:1] + check_output_lines[2:]
+    new_output = subprocess.check_output(['gdalinfo', 'images/geoimage_create_geotiff.tif']).decode("utf-8")
+    new_output_lines = new_output.splitlines()
+    new_out = new_output_lines[:1] + new_output_lines[2:]
+    assert orig_out == new_out
 
 
 def test_geoimage_get_epsg():
