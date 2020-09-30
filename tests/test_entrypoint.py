@@ -30,8 +30,10 @@ def test_entrypoint_handle_error():
     with open('data/entrypoint_handle_error.json', 'r') as checkfile:
         data = json.load(checkfile)
         letters = list(string.ascii_letters)
-        for i in enumerate(letters, 0):
-            assert data[str(i)] == entry.handle_error(i, letters[i])
+        count = 0
+        for letter in letters:
+            assert data[str(count)] == entry.handle_error(count, letter)
+            count += 1
 
 
 def test_entrypoint_load_metadata():
