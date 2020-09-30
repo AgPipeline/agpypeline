@@ -31,8 +31,8 @@ def test_entrypoint_handle_error():
         data = json.load(checkfile)
         letters = list(string.ascii_letters)
         count = 0
-        for letter in letters:
-            assert data[str(count)] == entry.handle_error(count, letter)
+        for key in data:
+            assert data[key] == entry.handle_error(count, letters[count])
             count += 1
 
 
