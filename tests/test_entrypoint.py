@@ -42,8 +42,9 @@ def test_entrypoint_load_metadata():
     entry = entrypoint.__internal__()
     bad_result = entry.load_metadata("")
     assert bad_result == {'error': "Unable to load metadata file ''"}
-    check_result = json.load(open("data/entrypoint_load_metadata_orig.json"))
-    assert entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json") == check_result
+    check_result = json.load(open("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json"))
+    assert entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json")['metadata']\
+           == check_result
 
 
 def test_entrypoint_check_params_result_error():
