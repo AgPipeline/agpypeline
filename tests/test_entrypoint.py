@@ -148,5 +148,9 @@ def test_entrypoint_add_parameters():
 def test_entrypoint_do_work():
     """Tests entrypoint's do_work function by passing in empty parameters"""
     parser = argparse.ArgumentParser()
-    result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
-    assert result == {}
+    try:
+        result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
+    except RuntimeError as error:
+        assert str(error) == "The Algorithm class method perform_process() must be overridden by a derived class"
+    else:
+        assert result == {}
