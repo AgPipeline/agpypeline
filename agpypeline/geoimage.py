@@ -42,7 +42,7 @@ def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress:
     out_px = np.array(gdal.Open(out_path).ReadAsArray())
 
     # If we have any pixels, we consider clipping a success
-    if np.shape[0] > 0 and np.shape[1] > 0:
+    if out_px.shape[0] > 0 and out_px.shape[1] > 0:
         if out_path == "temp.tif":
             os.remove(out_path)
         return out_px
