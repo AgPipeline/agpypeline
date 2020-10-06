@@ -23,6 +23,7 @@ def test_exists():
         assert os.path.isfile(file)
     assert os.path.isfile(JSON_FILE)
 
+
 def test_geometries_calculate_centroid_from_wkt():
     """Tests calculate_centroid_from_wkt on a few basic geometries from shapely.geometry"""
     test_point = Point(0, 0)
@@ -56,12 +57,13 @@ def test_geometries_convert_geometry():
     null_input_test = geometries.convert_geometry(None, None)
     assert null_input_test is None
     loaded_file = json.load(open(JSON_FILE, 'r'))
+    epsg = loaded_file["crs"]['properties']['name'].split('::')[-1]
     check_result = json.load(open("data/convert_geometry.json", 'r'))
     for feature in range(len(loaded_file["features"])):
         check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
         srs = osr.SpatialReference()
-        srs.SetFromUserInput("EPSG:3857")
+        srs.SetFromUserInput("EPSG:" + epsg)
         result = geometries.convert_geometry(geometry, srs)
         assert check_result[str(feature)] == str(result)
 

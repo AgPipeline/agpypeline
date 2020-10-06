@@ -32,11 +32,16 @@ def test_geoimage_clip_raster():
         os.remove("images/test_geoimage_clip_raster.tif")
     new_image = "images/test_geoimage_clip_raster.tif"
     open(new_image, 'w')
-    geoimage.clip_raster(TEST_IMAGE, (3972000, 3972600, 369000, 369700), new_image)
-    check_result = os.system("gdalinfo images/geoimage_clip_raster.tif")
+    src = gdal.Open(TEST_IMAGE)
+    ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
+    lrx = ulx + (src.RasterXSize * xres)
+    lry = uly + (src.RasterYSize * yres)
+    gps_bounds = (lry + (uly - lry) / 4, lry + 3 * (uly - lry) / 4, ulx + (lrx - ulx) / 4, ulx + 3 * (lrx - ulx) / 4)
+    geoimage.clip_raster(TEST_IMAGE, gps_bounds, new_image)
+    check_result = os.system("gdalinfo images/orig_geoimage_clip_raster.tif")
     new_output = os.system("gdalinfo images/test_geoimage_clip_raster.tif")
-    if os.path.isfile("images/geoimage_clip_raster.tif.aux.xml"):
-        os.remove("images/geoimage_clip_raster.tif.aux.xml")
+    if os.path.isfile("images/test_geoimage_clip_raster.tif.aux.xml"):
+        os.remove("images/test_geoimage_clip_raster.tif.aux.xml")
     assert check_result == new_output
 
 
@@ -84,11 +89,14 @@ def test_geoimage_clip_raster_intersection_json():
 
 
 def test_geoimage_create_geotiff():
-    """Tests create_geotiff, although a complete image is not generated at the moment. gps_bounds were extracted
-    from output.tin.tif"""
-    gps_bounds = (3972000, 3972600, 369000, 369700)
-    data = gdal.Open(TEST_IMAGE)
-    myarray = np.array(data.GetRasterBand(1).ReadAsArray())
+    """Tests create_geotiff, although a complete image is not generated at the moment. The coordinates used are
+    from gdal.open(TEST_IMAGE).GetGeoTransform()"""
+    src = gdal.Open(TEST_IMAGE)
+    ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
+    lrx = ulx + (src.RasterXSize * xres)
+    lry = uly + (src.RasterYSize * yres)
+    gps_bounds = (lry + (uly-lry)/4, lry + 3*(uly-lry)/4, ulx + (lrx-ulx)/4, ulx + 3*(lrx-ulx)/4)
+    myarray = np.array(src.GetRasterBand(1).ReadAsArray())
     if os.path.isfile("images/output.tif"):
         os.remove("images/output.tif")
     geoimage.create_geotiff(myarray, gps_bounds, out_path="images/geoimage_create_geotiff.tif", srid=26913,
