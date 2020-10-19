@@ -92,14 +92,16 @@ def test_geoimage_create_geotiff():
     """Tests create_geotiff, although a complete image is not generated at the moment. The coordinates used are
     from gdal.open(TEST_IMAGE).GetGeoTransform()"""
     src = gdal.Open(TEST_IMAGE)
+    # pylint: disable=unused-argument
     ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
+    # pylint: enable=unused-argument
     lrx = ulx + (src.RasterXSize * xres)
     lry = uly + (src.RasterYSize * yres)
-    gps_bounds = (lry + (uly-lry)/4, lry + 3*(uly-lry)/4, ulx + (lrx-ulx)/4, ulx + 3*(lrx-ulx)/4)
-    myarray = np.array(src.GetRasterBand(1).ReadAsArray())
+    gps_bounds = (lry + (uly - lry) / 4, lry + 3 * (uly - lry) / 4, ulx + (lrx - ulx) / 4, ulx + 3 * (lrx - ulx) / 4)
+    raster_array = np.array(src.GetRasterBand(1).ReadAsArray())
     if os.path.isfile("images/output.tif"):
         os.remove("images/output.tif")
-    geoimage.create_geotiff(myarray, gps_bounds, out_path="images/geoimage_create_geotiff.tif", srid=26913,
+    geoimage.create_geotiff(raster_array, gps_bounds, out_path="images/geoimage_create_geotiff.tif", srid=26913,
                             nodata=-9999)
     check_output = subprocess.check_output(['gdalinfo', 'images/geoimage_create_geotiff_orig.tif']).decode("utf-8")
     check_output_lines = check_output.splitlines()
