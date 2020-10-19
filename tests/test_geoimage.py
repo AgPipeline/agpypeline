@@ -93,8 +93,7 @@ def test_geoimage_create_geotiff():
     from gdal.open(TEST_IMAGE).GetGeoTransform()"""
     src = gdal.Open(TEST_IMAGE)
     # pylint: disable=unused-variable
-    ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
-    # pylint: disable=unused-variable
+    ulx, xres, _, uly, _, yres = src.GetGeoTransform()
     lrx = ulx + (src.RasterXSize * xres)
     lry = uly + (src.RasterYSize * yres)
     gps_bounds = (lry + (uly - lry) / 4, lry + 3 * (uly - lry) / 4, ulx + (lrx - ulx) / 4, ulx + 3 * (lrx - ulx) / 4)
