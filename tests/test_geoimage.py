@@ -92,7 +92,7 @@ def test_geoimage_create_geotiff():
     """Tests create_geotiff, although a complete image is not generated at the moment. The coordinates used are
     from gdal.open(TEST_IMAGE).GetGeoTransform()"""
     src = gdal.Open(TEST_IMAGE)
-    #pylint: disable=unused-argument
+    # pylint: disable=unused-variable
     ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
     lrx = ulx + (src.RasterXSize * xres)
     lry = uly + (src.RasterYSize * yres)
