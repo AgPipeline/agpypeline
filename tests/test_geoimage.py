@@ -33,7 +33,7 @@ def test_geoimage_clip_raster():
     new_image = "images/test_geoimage_clip_raster.tif"
     open(new_image, 'w')
     src = gdal.Open(TEST_IMAGE)
-    ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
+    ulx, xres, _, uly, _, yres = src.GetGeoTransform()
     lrx = ulx + (src.RasterXSize * xres)
     lry = uly + (src.RasterYSize * yres)
     gps_bounds = (lry + (uly - lry) / 4, lry + 3 * (uly - lry) / 4, ulx + (lrx - ulx) / 4, ulx + 3 * (lrx - ulx) / 4)
