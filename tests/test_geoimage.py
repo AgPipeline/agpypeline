@@ -94,7 +94,6 @@ def test_geoimage_create_geotiff():
     src = gdal.Open(TEST_IMAGE)
     #pylint: disable=unused-argument
     ulx, xres, xskew, uly, yskew, yres = src.GetGeoTransform()
-    #pylint: enable=unused-argument
     lrx = ulx + (src.RasterXSize * xres)
     lry = uly + (src.RasterYSize * yres)
     gps_bounds = (lry + (uly - lry) / 4, lry + 3 * (uly - lry) / 4, ulx + (lrx - ulx) / 4, ulx + 3 * (lrx - ulx) / 4)
