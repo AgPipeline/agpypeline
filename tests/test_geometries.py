@@ -69,6 +69,9 @@ def test_geometries_convert_geometry_from_file():
 
 
 def test_geometries_convert_geometry_from_polygon():
+    """Tests convert_geometry by checking the function call on geometries
+    created from ogr.Geometry and spatial references created from
+    osr.SpatialReference against a file containing function call results"""
     check_result = json.load(open("data/convert_geometry_from_polygon.json", 'r'))
     ring = ogr.Geometry(ogr.wkbLinearRing)
     ring.AddPoint(1, 0)
