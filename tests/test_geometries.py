@@ -51,14 +51,14 @@ def test_geometries_calculate_overlap_percent():
     assert round(geometries.calculate_overlap_percent(check_bounds, bounding_box), 4) == 0.7591
 
 
-def test_geometries_convert_geometry():
+def test_geometries_convert_geometry_from_file():
     """Tests convert_geometry by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
     null_input_test = geometries.convert_geometry(None, None)
     assert null_input_test is None
     loaded_file = json.load(open(JSON_FILE, 'r'))
     epsg = loaded_file["crs"]['properties']['name'].split('::')[-1]
-    check_result = json.load(open("data/convert_geometry.json", 'r'))
+    check_result = json.load(open("data/convert_geometry_from_file.json", 'r'))
     for feature in range(len(loaded_file["features"])):
         check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
@@ -66,6 +66,26 @@ def test_geometries_convert_geometry():
         srs.SetFromUserInput("EPSG:" + epsg)
         result = geometries.convert_geometry(geometry, srs)
         assert check_result[str(feature)] == str(result)
+
+
+def test_geometries_convert_geometry_from_polygon():
+    check_result = json.load(open("data/convert_geometry_from_polygon.json", 'r'))
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(1, 0)
+    ring.AddPoint(0, 1)
+    ring.AddPoint(-1, 0)
+    ring.AddPoint(0, -1)
+    poly = ogr.Geometry(ogr.wkbPolygon)
+    poly.AddGeometry(ring)
+    source = osr.SpatialReference()
+    source.ImportFromEPSG(4326)
+    poly.AssignSpatialReference(source)
+    result = geometries.convert_geometry(poly, source)
+    assert check_result["same_epsg"] == str(result)
+    source2 = osr.SpatialReference()
+    source2.ImportFromEPSG(3857)
+    result2 = geometries.convert_geometry(poly, source2)
+    assert check_result["different_epsg"] == str(result2)
 
 
 def test_geometries_geometry_to_tuples():
