@@ -13,7 +13,7 @@ The metadata keys listed below are all defined in the [BRAPI V1.3](https://brapi
 *  studyName - the name of the study the data belongs to
 *  season - the season associated with the data
 *  observationTimeStamp - a timestamp override in ISO 8610 long format
-*  germplasmName - the name of the crop being tested in the plot
+*  species - the name of the crop being tested in the plot
 *  collectingSite - site identification
 
 If the observationTimeStamp metadata key is not specified, the EXIF information in source image files are checked and the earliest found timestamp will be used. 
