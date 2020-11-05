@@ -203,7 +203,7 @@ class Environment:
                     if timestamp is None:
                         working_timestamp = __internal__.get_first_timestamp(one_file, working_timestamp)
         if timestamp is None:
-            timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
+            timestamp = working_timestamp if working_timestamp else ''
 
         # Prepare our parameters
         check_md = {'timestamp': timestamp,
