@@ -39,6 +39,8 @@ RUN apt-get update && \
         numpy && \
     python3 -m pip install --upgrade --no-cache-dir \
         pygdal==2.2.3.* && \
+    python3 -m pip install --upgrade --no-cache-dir \
+        pylint && \
     apt-get remove -y \
         libgdal-dev \
         gcc \
@@ -51,8 +53,14 @@ RUN apt-get update && \
 # Install the library
 COPY agpypeline /tmp/agpypeline/agpypeline
 COPY setup.py README.md /tmp/agpypeline/
-
+COPY tests /tmp/agpypeline/tests
+COPY data /tmp/agpypeline/data
+COPY images /tmp/agpypeline/images
 
 RUN python3 -m pip install --upgrade /tmp/agpypeline
+#RUN python3 -m pip install pytest
+#
+#ENTRYPOINT ["/bin/bash"]
+#RUN python3 -m pytest
 
-USER extractor
+USER root
