@@ -205,6 +205,30 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
             output_raster.GetRasterBand(1).SetNoDataValue(nodata)
 
 
+def get_centroid_latlon(filename: str) -> ogr.Geometry:
+    """Returns the bounds and epsg of a geo-referenced image file
+    Arguments:
+        filename: the path to the file to get the centroid from
+    Returns:
+        Returns the centroid of the geometry loaded from the file in lat-lon coordinates
+        as a result of calling geometries.get_centroid_latlon()
+    Exceptions:
+        RuntimeError is raised if the image is not a geo referenced image with an EPSG code,
+        the EPSG code is not supported, or another problems occurs
+    """
+    bounds = image_get_geobounds(filename)
+    if np.nan in bounds:
+        msg = "File is not a geo-referenced image file: %s" % filename
+        logging.error(msg)
+        raise RuntimeError(msg)
+    epsg = get_epsg(filename)
+    if epsg is None:
+        msg = "EPSG is not found in image file: '%s'" % filename
+        logging.error(msg)
+        raise RuntimeError(msg)
+    return geometries.make_centroid_geometry(bounds, epsg, filename)
+
+
 def get_epsg(filename: str) -> Optional[str]:
     """Returns the EPSG of the georeferenced image file
     Args:
