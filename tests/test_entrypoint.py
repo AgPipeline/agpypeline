@@ -43,7 +43,7 @@ def test_entrypoint_load_metadata():
     bad_result = entry.load_metadata("")
     assert bad_result == {'error': "Unable to load metadata file ''"}
     check_result = json.load(open("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json"))
-    assert entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json")['metadata']\
+    assert entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json")['metadata'] \
            == check_result
 
 
@@ -84,7 +84,8 @@ def test_entrypoint_load_metadata_files():
     entry = entrypoint.__internal__()
     assert entry.load_metadata_files([]) == {'metadata': []}
     check_result = json.load(open("data/entrypoint_load_metadata_files.json"))
-    assert entry.load_metadata_files(["data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json"]) == check_result
+    assert entry.load_metadata_files(
+        ["data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json"]) == check_result
 
 
 def test_entrypoint_handle_check_continue_parse_continue_result():
@@ -122,9 +123,11 @@ def test_entrypoint_perform_processing():
 def test_entrypoint_handle_result():
     """Tests entrypoint's handle_result function both by passing in empty parameters and by passing in a file path
     to check for a result"""
+
     def delete_txt_file():
         if os.path.isfile("data/entrypoint_handle_result.txt"):
             os.remove("data/entrypoint_handle_result.txt")
+
     entry = entrypoint.__internal__()
     assert entry.handle_result({}) == {}
     assert entry.handle_result({}, "", "") == {}
@@ -141,8 +144,8 @@ def test_entrypoint_add_parameters():
     """Tests entrypoint's add_parameters function by passing in empty parameters"""
     parser = argparse.ArgumentParser()
     entrypoint.add_parameters(parser, algorithm.Algorithm(), environment.Environment(configuration.Configuration()))
-    assert str(parser.parse_args()) == "Namespace(debug=30, file_list=[], info=30, metadata=None," \
-                                       " result='all', working_space=None)"
+    assert str(parser.parse_args()) == "Namespace(debug=30, info=30, result='all', " \
+                                       "metadata=None, working_space=None, file_list=[])"
 
 
 def test_entrypoint_do_work():
