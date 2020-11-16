@@ -233,6 +233,7 @@ def get_centroid_latlon(filename: str) -> ogr.Geometry:
     dest_spatial = osr.SpatialReference()
     if int(osgeo.__version__[0]) >= 3:
         # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
+        # pylint: disable=no-member
         dest_spatial.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
 
     if dest_spatial.ImportFromEPSG(int(LAT_LON_EPSG_CODE)) != ogr.OGRERR_NONE:

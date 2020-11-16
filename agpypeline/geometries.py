@@ -67,6 +67,7 @@ def convert_geometry(geometry: ogr.Geometry, new_spatialreference: osr.SpatialRe
         geom_sr = geometry.GetSpatialReference()
         if int(osgeo.__version__[0]) >= 3:
             # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
+            # pylint: disable=no-member
             geom_sr.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
         if geom_sr and not new_spatialreference.IsSame(geom_sr):
             transform = osr.CreateCoordinateTransformation(geom_sr, new_spatialreference)
