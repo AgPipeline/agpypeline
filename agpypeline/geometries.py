@@ -3,13 +3,11 @@
 
 import json
 import logging
-import osgeo
 from typing import Optional
+import osgeo
 import yaml
 from osgeo import ogr
 from osgeo import osr
-
-LAT_LON_EPSG_CODE = 4326
 
 
 def calculate_centroid_from_wkt(wkt: str) -> tuple:
@@ -137,66 +135,13 @@ def geometry_to_geojson(geom: ogr.Geometry, alt_coord_type: str = None, alt_coor
     return json.dumps(geom_json)
 
 
-def make_centroid_geometry(bounds: list, epsg: str, filename: str) -> ogr.Geometry:
-    """Returns the centroid of the geo-referenced image file as an OGR point.
-    This function is called from get_centroid_latlon() in geoimage.py in order to
-    perform the geometric processing of the file bounds
-    Arguments:
-        bounds: a list containing the bounds of the georeferenced image
-        epsg: the geo-referenced image's epsg code
-        filename: the path to the file to get the centroid from
-    Returns:
-        Returns the centroid of the geometry loaded from the file in lat-lon coordinates
-    Exceptions:
-        RuntimeError is raised if the image is not a geo referenced image with an EPSG code,
-        the EPSG code is not supported, or another problems occurs
-    """
-    ring = ogr.Geometry(ogr.wkbLinearRing)
-    ring.AddPoint(bounds[2], bounds[1])  # Upper left
-    ring.AddPoint(bounds[3], bounds[1])  # Upper right
-    ring.AddPoint(bounds[3], bounds[0])  # lower right
-    ring.AddPoint(bounds[2], bounds[0])  # lower left
-    ring.AddPoint(bounds[2], bounds[1])  # Closing the polygon
-
-    poly = ogr.Geometry(ogr.wkbPolygon)
-    poly.AddGeometry(ring)
-
-    ref_sys = osr.SpatialReference()
-    if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
-        poly.AssignSpatialReference(ref_sys)
-    else:
-        msg = "Failed to import EPSG %s for image file %s" % (str(epsg), filename)
-        logging.error(msg)
-        raise RuntimeError(msg)
-
-    # Convert the polygon to lat-lon
-    dest_spatial = osr.SpatialReference()
-    if int(osgeo.__version__[0]) >= 3:
-        # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
-        dest_spatial.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
-
-    if dest_spatial.ImportFromEPSG(int(LAT_LON_EPSG_CODE)) != ogr.OGRERR_NONE:
-        msg = "Failed to import EPSG %s for conversion to lat-lon" % str(LAT_LON_EPSG_CODE)
-        logging.error(msg)
-        raise RuntimeError(msg)
-
-    transform = osr.CoordinateTransformation(ref_sys, dest_spatial)
-    new_src = poly.Clone()
-    if new_src:
-        new_src.Transform(transform)
-    else:
-        msg = "Failed to transform file polygon to lat-lon" % filename
-        logging.error(msg)
-        raise RuntimeError(msg)
-
-    return new_src.Centroid()
-
-
-def polygon_from_ring(ring: ogr.Geometry, epsg: int = None) -> Optional[ogr.Geometry]:
+def polygon_from_ring(ring: ogr.Geometry, epsg: int = None, filename: str = None) -> Optional[ogr.Geometry]:
     """Creates a polygon from the linear ring geometry passed in
     Arguments:
         ring: the linear ring to create the polygon with
         epsg: the EPSG code to assign to the polygon
+        filename: if the epsg is invalid and a filename is specified,
+        the formatted filename is returned in an error message
     Return:
         The created polygon, or None if an EPSG code is specified and can't be loaded
     Exceptions:
@@ -209,7 +154,10 @@ def polygon_from_ring(ring: ogr.Geometry, epsg: int = None) -> Optional[ogr.Geom
     if epsg is not None:
         if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
             poly.AssignSpatialReference(ref_sys)
+        elif filename is not None:
+            msg = "Failed to import EPSG %s for image file %s" % (str(epsg), filename)
+            logging.error(msg)
+            raise RuntimeError(msg)
         else:
             return None
-
     return poly

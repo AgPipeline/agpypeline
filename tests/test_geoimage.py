@@ -157,6 +157,6 @@ def test_geoimage_retrieve_centroid_latlon():
     with pytest.raises(RuntimeError) as excinfo:
         jpg_file = "images/jpg_images/DJI_0340.JPG"
         geoimage.get_centroid_latlon(jpg_file)
-    assert "EPSG is not found in image file: '" + jpg_file + "'" in str(excinfo.value)
+    assert "File is not a geo-referenced image file: " + jpg_file in str(excinfo.value)
     res = geoimage.get_centroid_latlon(TEST_IMAGE)
     assert str(res) == "POINT (-106.44744820025 35.8862725499103)"
