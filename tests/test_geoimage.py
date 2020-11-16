@@ -145,7 +145,7 @@ def test_geoimage_image_get_geobounds():
     assert res == check
 
 
-def test_geoimage_retrieve_centroid_latlon():
+def test_geoimage_get_centroid_latlon():
     """Tests get_centroid_latlon from geoimage.py and
     make_centroid_geometry in geometries.py. It is checked
     whether the function raises errors in order to ensure
