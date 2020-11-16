@@ -142,10 +142,12 @@ def test_entrypoint_handle_result():
 
 def test_entrypoint_add_parameters():
     """Tests entrypoint's add_parameters function by passing in empty parameters"""
+    check_result = json.load(open("data/entrypoint_add_parameters.json", 'r'))
     parser = argparse.ArgumentParser()
     entrypoint.add_parameters(parser, algorithm.Algorithm(), environment.Environment(configuration.Configuration()))
-    assert str(parser.parse_args()) == "Namespace(debug=30, info=30, result='all', " \
-                                       "metadata=None, working_space=None, file_list=[])"
+    args = parser.parse_args()
+    for arg in vars(args):
+        assert arg in check_result and check_result[arg] == str(getattr(args, arg))
 
 
 def test_entrypoint_do_work():
