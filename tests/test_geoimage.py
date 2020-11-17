@@ -9,6 +9,7 @@ import json
 import os
 import subprocess
 import numpy as np
+import pytest
 from numpy import nan
 from osgeo import gdal, ogr
 
@@ -142,3 +143,20 @@ def test_geoimage_image_get_geobounds():
     res = geoimage.image_get_geobounds(TEST_IMAGE)
     check = json.load(open("data/geoimage_image_get_geobounds.json"))
     assert res == check
+
+
+def test_geoimage_get_centroid_latlon():
+    """Tests get_centroid_latlon from geoimage.py and
+    make_centroid_geometry in geometries.py. It is checked
+    whether the function raises errors in order to ensure
+    that error blocks are reached, and valid output is also
+    checked"""
+    with pytest.raises(RuntimeError) as excinfo:
+        geoimage.get_centroid_latlon("")
+    assert "File is not a geo-referenced image file: " in str(excinfo.value)
+    with pytest.raises(RuntimeError) as excinfo:
+        jpg_file = "images/jpg_images/DJI_0340.JPG"
+        geoimage.get_centroid_latlon(jpg_file)
+    assert "File is not a geo-referenced image file: " + jpg_file in str(excinfo.value)
+    res = geoimage.get_centroid_latlon(TEST_IMAGE)
+    assert str(res) == "POINT (-106.44744820025 35.8862725499103)"

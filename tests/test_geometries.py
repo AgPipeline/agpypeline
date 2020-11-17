@@ -78,17 +78,23 @@ def test_geometries_convert_geometry_from_polygon():
     ring.AddPoint(0, 1)
     ring.AddPoint(-1, 0)
     ring.AddPoint(0, -1)
+    ring.AddPoint(1, 0)
     poly = ogr.Geometry(ogr.wkbPolygon)
     poly.AddGeometry(ring)
+    assert poly.IsValid()
     source = osr.SpatialReference()
     source.ImportFromEPSG(4326)
     poly.AssignSpatialReference(source)
     result = geometries.convert_geometry(poly, source)
-    assert check_result["same_epsg"] == str(result)
+    check1 = geometries.geometry_to_tuples(result)
+    assert check_result["same_epsg"] == list(check1)
     source2 = osr.SpatialReference()
     source2.ImportFromEPSG(3857)
     result2 = geometries.convert_geometry(poly, source2)
-    assert check_result["different_epsg"] == str(result2)
+    check2 = geometries.geometry_to_tuples(result2)
+    different_epsg = check_result["different_epsg"]
+    for i in range(len(list(check2))):
+        assert check2[i] - different_epsg[i] <= 1e-6
 
 
 def test_geometries_geometry_to_tuples():
