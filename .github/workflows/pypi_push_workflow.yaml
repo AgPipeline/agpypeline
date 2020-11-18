@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - master
+      - stronger_typing
 jobs:
   publish:
     runs-on: ubuntu-latest
