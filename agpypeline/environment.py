@@ -226,16 +226,6 @@ class Environment:
         check_md.experiment = experiment_name
         check_md.working_folder = args.working_space
         check_md.list_files = lambda: file_list
-        # check_md = {'timestamp': timestamp,
-        #             'season': season_name,
-        #             'experiment': experiment_name,
-        #             'container_name': None,
-        #             'target_container_name': None,
-        #             'trigger_name': None,
-        #             'context_md': None,
-        #             'working_folder': args.working_space,
-        #             'list_files': lambda: file_list
-        #             }
 
         # Return dictionary of parameters for Algorithm class method calls
         return {'check_md': check_md,
