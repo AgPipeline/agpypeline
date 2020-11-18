@@ -357,7 +357,7 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
     parser.add_argument('m', '--metadata', type=argparse.FileType('rt'), nargs='+',
                         required=True, help='The path to the source metadata')
 
-    parser.add_argument('--working_space', type=str,
+    parser.add_argument('w', '--working_space', type=str, default='output',
                         help='the folder to use use as a workspace and for storing results')
 
     # Let the transformer class add parameters
@@ -394,6 +394,8 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     args = parser.parse_args()
     if bad := list(filter(lambda f: not os.path.isfile(f), args.file_list)):
         parser.error(f'Invalid files: {", ".join(bad)}')
+    if not os.path.isdir(args.working_space):
+        os.makedirs(args.working_space)
 
     # start logging system
     logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)

@@ -4,7 +4,7 @@
 import argparse
 import datetime
 import logging
-from typing import Optional, Union
+from typing import List, NamedTuple, Optional, Union, TextIO
 import piexif
 
 from agpypeline.configuration import Configuration
@@ -159,7 +159,7 @@ class Environment:
         """
         # pylint: disable=no-self-use
         parser.epilog = str(self.configuration.transformer_name) + ' version ' \
-            + str(self.configuration.transformer_version) + ' author ' + str(
+                        + str(self.configuration.transformer_version) + ' author ' + str(
             self.configuration.author_name) + ' ' + str(self.configuration.author_email)
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
@@ -218,19 +218,39 @@ class Environment:
             timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
 
         # Prepare our parameters
-        check_md = {'timestamp': timestamp,
-                    'season': season_name,
-                    'experiment': experiment_name,
-                    'container_name': None,
-                    'target_container_name': None,
-                    'trigger_name': None,
-                    'context_md': None,
-                    'working_folder': args.working_space,
-                    'list_files': lambda: file_list
-                    }
+        description = NamedTuple()
+        check_md = CheckMD(description)
+
+        check_md.timestamp = timestamp
+        check_md.season = season_name
+        check_md.experiment = experiment_name
+        check_md.working_folder = args.working_space
+        check_md.list_files = lambda: file_list
+        # check_md = {'timestamp': timestamp,
+        #             'season': season_name,
+        #             'experiment': experiment_name,
+        #             'container_name': None,
+        #             'target_container_name': None,
+        #             'trigger_name': None,
+        #             'context_md': None,
+        #             'working_folder': args.working_space,
+        #             'list_files': lambda: file_list
+        #             }
 
         # Return dictionary of parameters for Algorithm class method calls
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
                 }
+
+
+class CheckMD(NamedTuple):
+    timestamp: str
+    season: str
+    experiment: str
+    container_name: Optional[str]
+    target_container_name: Optional[str]
+    trigger_name: Optional[str]
+    context_md: Optional[str]
+    working_folder: str
+    list_files: List[TextIO]
