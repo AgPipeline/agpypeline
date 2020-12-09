@@ -217,15 +217,10 @@ class Environment:
         if timestamp is None:
             timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
 
+        list_files = lambda: file_list
         # Prepare our parameters
-        description = NamedTuple()
-        check_md = CheckMD(description)
-
-        check_md.timestamp = timestamp
-        check_md.season = season_name
-        check_md.experiment = experiment_name
-        check_md.working_folder = args.working_space
-        check_md.list_files = lambda: file_list
+        check_md = CheckMD(timestamp=timestamp, season=season_name, experiment=experiment_name,
+                           working_folder=args.working_space, list_files=list_files)
 
         # Return dictionary of parameters for Algorithm class method calls
         return {'check_md': check_md,
@@ -238,9 +233,9 @@ class CheckMD(NamedTuple):
     timestamp: str
     season: str
     experiment: str
-    container_name: Optional[str]
-    target_container_name: Optional[str]
-    trigger_name: Optional[str]
-    context_md: Optional[str]
     working_folder: str
     list_files: List[TextIO]
+    container_name: Optional[str] = None
+    target_container_name: Optional[str] = None
+    trigger_name: Optional[str] = None
+    context_md: Optional[str] = None
