@@ -24,10 +24,10 @@ class __internal__:
         """
 
     @staticmethod
-    def ensure_ts_format(ts: str, ts_separator: str = None) -> str:
+    def ensure_ts_format(tstamp: str, ts_separator: str = None) -> str:
         """Tries to ensure the timestamp is in the correct format (ISO 8601)
         Args:
-            ts: the timestamp to correct
+            tstamp: the timestamp to correct
             ts_separator: the separator to use instead of the default values
         Return:
             Returns the corrected timestamp or the original if no changes were needed
@@ -38,19 +38,19 @@ class __internal__:
             If the ts string contains multiple separators the trimmed string is returned.
         """
         parts = None
-        cur_ts = ts.strip()
+        cur_ts = tstamp.strip()
 
         # Check for a separator
         if ts_separator is not None:
             parts = cur_ts.split(ts_separator)
-        elif 'T' in ts:
+        elif 'T' in cur_ts:
             parts = cur_ts.split('T')
         elif ' ' in cur_ts:
-            parts = ts.split(' ')
+            parts = cur_ts.split(' ')
 
         # Check validity
         if len(parts) > 2:
-            logging.warning("Unable to correct timestamp %s", ts)
+            logging.warning("Unable to correct timestamp %s", tstamp)
             return cur_ts
 
         # If there's only one part, we just return the timestamp
