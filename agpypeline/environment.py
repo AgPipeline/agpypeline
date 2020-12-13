@@ -206,6 +206,7 @@ class Environment:
         # hasn't been specified yet
         file_list = []
         working_timestamp = timestamp
+
         if args.file_list:
             for one_file in args.file_list:
                 # Filter out arguments that are obviously not files

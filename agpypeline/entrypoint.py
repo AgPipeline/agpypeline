@@ -163,11 +163,13 @@ class __internal__:
         metadata = []
         result = {'metadata': metadata}
         for metadata_file in metadata_files:
-            if not os.path.exists(str(metadata_file)):
-                result = __internal__.handle_error(-2, "Unable to access metadata file '%s'" % metadata_file)
+            if not metadata_file.closed:
+                metadata_file.close()
+            if not os.path.exists(str(metadata_file.name)):
+                result = __internal__.handle_error(-2, "Unable to access metadata file '%s'" % metadata_file.name)
                 break
-            logging.info("Loading metadata from file: '%s'", metadata_file)
-            md_loaded = __internal__.load_metadata(metadata_file)
+            logging.info("Loading metadata from file: '%s'", metadata_file.name)
+            md_loaded = __internal__.load_metadata(metadata_file.name)
             if 'metadata' in md_loaded:
                 metadata.append(md_loaded['metadata'])
             else:
@@ -354,7 +356,7 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
     parser.add_argument('--result', nargs='?', default='all',
                         help='Direct the result of a run to one or more of (all is default): "all,file,print"')
 
-    parser.add_argument('-m', '--metadata', type=str, nargs='+',
+    parser.add_argument('-m', '--metadata', type=argparse.FileType('rt'), nargs='+',
                         required=True, help='The path to the source metadata')
 
     parser.add_argument('-w', '--working_space', type=str, default='output',
