@@ -230,7 +230,10 @@ class Environment:
                 }
 
 
+# pylint disable=invalid-name
 class CheckMD(NamedTuple):
+    """This is the CheckMD class based off of NamedTuple which can be used in
+    order to store data passed into argparse."""
     timestamp: str
     season: str
     experiment: str

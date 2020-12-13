@@ -94,6 +94,9 @@ def test_environment_get_transformer_params():
     namespace.file_list = []
     namespace.working_space = []
     result = environ.get_transformer_params(namespace, [])
-    result['check_md']["list_files"] = None
-    result['check_md']["timestamp"] = None
-    assert result == check_result
+    result_dict = {'transformer_md': result['transformer_md'], 'full_md': result['full_md']}
+    check_md = dict(result['check_md']._asdict())
+    check_md['timestamp'] = ''
+    check_md['list_files'] = ''
+    result_dict['check_md'] = check_md
+    assert  check_result == result_dict
