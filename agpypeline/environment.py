@@ -53,7 +53,6 @@ class __internal__:
                 value = value.decode('UTF-8').strip()
             else:
                 value = value.strip()
-
             split_char = None
             if " " in value:
                 partial = value.split()
