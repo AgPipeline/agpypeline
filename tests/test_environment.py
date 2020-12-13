@@ -99,4 +99,4 @@ def test_environment_get_transformer_params():
     check_md['timestamp'] = ''
     check_md['list_files'] = ''
     result_dict['check_md'] = check_md
-    assert  check_result == result_dict
+    assert check_result == result_dict
