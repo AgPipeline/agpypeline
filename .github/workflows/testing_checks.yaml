@@ -4,11 +4,11 @@ on:
     branches:
       - master
       - develop
+      - adding_tests
   pull_request:
     branches:
       - master
       - develop
-      - adding_tests
     tags:
       - v*
   workflow_dispatch:
