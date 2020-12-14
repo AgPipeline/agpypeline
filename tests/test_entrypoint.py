@@ -161,4 +161,3 @@ def test_entrypoint_do_work():
         assert result == {}
     except SystemExit as sysexit:
         assert str(sysexit) != "0"
-
