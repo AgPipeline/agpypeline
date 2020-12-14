@@ -136,7 +136,7 @@ def geometry_to_geojson(geom: ogr.Geometry, alt_coord_type: str = None, alt_coor
     return json.dumps(geom_json)
 
 
-def polygon_from_ring(ring: ogr.Geometry, epsg: int = None, filename: str = None) -> Optional[ogr.Geometry]:
+def polygon_from_ring(ring: ogr.Geometry, epsg: int = None) -> Optional[ogr.Geometry]:
     """Creates a polygon from the linear ring geometry passed in
     Arguments:
         ring: the linear ring to create the polygon with

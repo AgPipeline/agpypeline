@@ -307,7 +307,7 @@ def get_image_bounds(file_path: str, default_epsg: int = None) -> Optional[ogr.G
     ring.AddPoint(bounds[3], bounds[0])  # lower right
     ring.AddPoint(bounds[2], bounds[0])  # lower left
     ring.AddPoint(bounds[2], bounds[1])  # Closing the polygon
-    return geometries.polygon_from_ring(ring, int(epsg), file_path)
+    return geometries.polygon_from_ring(ring, int(epsg))
 
 
 def get_image_bounds_json(file_path: str, default_epsg: int = None) -> Optional[str]:
