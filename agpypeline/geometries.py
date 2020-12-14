@@ -155,10 +155,6 @@ def polygon_from_ring(ring: ogr.Geometry, epsg: int = None, filename: str = None
     if epsg is not None:
         if ref_sys.ImportFromEPSG(int(epsg)) == ogr.OGRERR_NONE:
             poly.AssignSpatialReference(ref_sys)
-        elif filename is not None:
-            msg = "Failed to import EPSG %s for image file %s" % (str(epsg), filename)
-            logging.error(msg)
-            raise RuntimeError(msg)
         else:
             return None
     return poly
