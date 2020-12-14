@@ -163,13 +163,15 @@ class __internal__:
         metadata = []
         result = {'metadata': metadata}
         for metadata_file in metadata_files:
-            if not metadata_file.closed:
-                metadata_file.close()
-            if not os.path.exists(str(metadata_file.name)):
+            if hasattr(metadata_file, 'name'):
+                if not metadata_file.closed:
+                    metadata_file.close()
+                metadata_file = metadata_file.name
+            if not os.path.exists(str(metadata_file)):
                 result = __internal__.handle_error(-2, "Unable to access metadata file '%s'" % metadata_file.name)
                 break
-            logging.info("Loading metadata from file: '%s'", metadata_file.name)
-            md_loaded = __internal__.load_metadata(metadata_file.name)
+            logging.info("Loading metadata from file: '%s'", metadata_file)
+            md_loaded = __internal__.load_metadata(metadata_file)
             if 'metadata' in md_loaded:
                 metadata.append(md_loaded['metadata'])
             else:
