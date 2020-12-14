@@ -149,8 +149,8 @@ def test_entrypoint_add_parameters():
         args = parser.parse_args()
         for arg in vars(args):
             assert arg in check_result and check_result[arg] == str(getattr(args, arg))
-    except SystemExit as e:
-        assert str(e) != "0"
+    except SystemExit as sysexit:
+        assert str(sysexit) != "0"
 
 
 def test_entrypoint_do_work():
@@ -159,6 +159,6 @@ def test_entrypoint_do_work():
     try:
         result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
         assert result == {}
-    except SystemExit as e:
-        assert str(e) != "0"
+    except SystemExit as sysexit:
+        assert str(sysexit) != "0"
 
