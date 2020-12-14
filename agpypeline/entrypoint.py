@@ -354,8 +354,7 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
     parser.add_argument('--result', nargs='?', default='all',
                         help='Direct the result of a run to one or more of (all is default): "all,file,print"')
 
-    parser.add_argument('m', '--metadata', type=argparse.FileType('rt'), nargs='+',
-                        required=True, help='The path to the source metadata')
+    parser.add_argument('--metadata', type=str, action='append', help='The path to the source metadata')
 
     parser.add_argument('--working_space', type=str,
                         help='the folder to use use as a workspace and for storing results')
@@ -369,8 +368,7 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
         algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
-    parser.add_argument('file_list', nargs='+', type=argparse.FileType('r'),
-                        help='additional files for transformer')
+    parser.add_argument('file_list', nargs=argparse.REMAINDER, help='additional files for transformer')
 
 
 def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
@@ -392,8 +390,6 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
 
     add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
-    if bad := list(filter(lambda f: not os.path.isfile(f), args.file_list)):
-        parser.error(f'Invalid files: {", ".join(bad)}')
 
     # start logging system
     logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)
