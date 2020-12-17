@@ -24,6 +24,60 @@ class __internal__:
         """
 
     @staticmethod
+    def ensure_ts_format(tstamp: str, ts_separator: str = None) -> str:
+        """Tries to ensure the timestamp is in the correct format (ISO 8601)
+        Args:
+            tstamp: the timestamp to correct
+            ts_separator: the separator to use instead of the default values
+        Return:
+            Returns the corrected timestamp or the original if no changes were needed
+        Notes:
+            Whitespace is trimmed from the ends of the ts string before it's  processed.
+            If the ts_separator parameter is not specified and the ts parameter doesn't contain 'T' (per ISO 8601)
+            or ' ' (space) as a separator between the date and time, the original string is returned.
+            If the ts string contains multiple separators the trimmed string is returned.
+        """
+        parts = None
+        cur_ts = tstamp.strip()
+
+        # Check for a separator
+        if ts_separator is not None:
+            parts = cur_ts.split(ts_separator)
+        elif 'T' in cur_ts:
+            parts = cur_ts.split('T')
+        elif ' ' in cur_ts:
+            parts = cur_ts.split(' ')
+
+        # Check validity
+        if len(parts) > 2:
+            logging.warning("Unable to correct timestamp %s", tstamp)
+            return cur_ts
+
+        # If there's only one part, we just return the timestamp
+        if len(parts) == 1:
+            return cur_ts
+
+        # Check for a valid timestamp
+        if '-' in parts[0] and ':' in parts[1]:
+            return 'T'.join(parts)
+
+        # Format the timestamp and return it
+        return_ts = ''
+        separator = '-'
+        part_separator = 'T'
+        for pidx in (0, 1):
+            for idx in range(0, len(parts[pidx])):
+                if parts[pidx][idx].isdigit():
+                    return_ts += parts[pidx][idx]
+                else:
+                    return_ts += separator
+            return_ts += part_separator
+            separator = ':'
+            part_separator = ''
+
+        return return_ts
+
+    @staticmethod
     def exif_tags_to_timestamp(exif_tags: dict) -> Optional[datetime.datetime]:
         """Looks up the origin timestamp and a timestamp offset in the exit tags and returns
            a datetime object
@@ -73,7 +127,7 @@ class __internal__:
 
         # Process the EXIF data
         if EXIF_ORIGIN_TIMESTAMP in exif_tags:
-            cur_stamp = convert_and_clean_tag(exif_tags[EXIF_ORIGIN_TIMESTAMP])
+            cur_stamp = __internal__.ensure_ts_format(convert_and_clean_tag(exif_tags[EXIF_ORIGIN_TIMESTAMP]))
         if not cur_stamp:
             return None
 
@@ -214,7 +268,7 @@ class Environment:
                     if timestamp is None:
                         working_timestamp = __internal__.get_first_timestamp(one_file, working_timestamp)
         if timestamp is None:
-            timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
+            timestamp = working_timestamp if working_timestamp else ''
 
         # Prepare our parameters
         check_md = {'timestamp': timestamp,
