@@ -201,8 +201,9 @@ class Environment:
             parser: instance of argparse
         """
         # pylint: disable=no-self-use
-        parser.epilog = str(self.configuration.transformer_name) + ' version ' + str(self.configuration.transformer_version) +\
-                        ' author ' + str(self.configuration.author_name) + ' ' + str(self.configuration.author_email)
+        parser.epilog = str(self.configuration.transformer_name) + ' version ' \
+            + str(self.configuration.transformer_version) + ' author ' + str(
+            self.configuration.author_name) + ' ' + str(self.configuration.author_email)
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
         """Returns a parameter list for processing data

@@ -4,6 +4,7 @@
 import json
 import logging
 from typing import Optional
+import osgeo
 import yaml
 from osgeo import ogr
 from osgeo import osr
@@ -64,6 +65,10 @@ def convert_geometry(geometry: ogr.Geometry, new_spatialreference: osr.SpatialRe
     return_geometry = geometry
     try:
         geom_sr = geometry.GetSpatialReference()
+        if int(osgeo.__version__[0]) >= 3:
+            # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
+            # pylint: disable=no-member
+            geom_sr.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
         if geom_sr and not new_spatialreference.IsSame(geom_sr):
             transform = osr.CreateCoordinateTransformation(geom_sr, new_spatialreference)
             new_geom = geometry.Clone()
@@ -77,18 +82,6 @@ def convert_geometry(geometry: ogr.Geometry, new_spatialreference: osr.SpatialRe
     return return_geometry
 
 
-def geometry_to_tuples(geom: ogr.Geometry) -> tuple:
-    """Returns the bounds of the shape
-    Arguments:
-        geom: the geometry to return the bounds of
-    Return:
-        A tuple containing the bounds in (min Y, max Y, min X, max X) order
-    """
-    current_env = geom.GetEnvelope()
-
-    return current_env[2], current_env[3], current_env[0], current_env[1]
-
-
 def geojson_to_tuples(bounding_box: str) -> tuple:
     """Returns the bounds of the shape
     Arguments:
@@ -99,6 +92,18 @@ def geojson_to_tuples(bounding_box: str) -> tuple:
     yaml_geom = yaml.safe_load(bounding_box)
     current_geom = ogr.CreateGeometryFromJson(json.dumps(yaml_geom))
     return geometry_to_tuples(current_geom)
+
+
+def geometry_to_tuples(geom: ogr.Geometry) -> tuple:
+    """Returns the bounds of the shape
+    Arguments:
+        geom: the geometry to return the bounds of
+    Return:
+        A tuple containing the bounds in (min Y, max Y, min X, max X) order
+    """
+    current_env = geom.GetEnvelope()
+
+    return current_env[2], current_env[3], current_env[0], current_env[1]
 
 
 def geometry_to_geojson(geom: ogr.Geometry, alt_coord_type: str = None, alt_coord_code: str = None) -> str:
@@ -128,7 +133,6 @@ def geometry_to_geojson(geom: ogr.Geometry, alt_coord_type: str = None, alt_coor
                 'code': ref_sys.GetAttrValue("AUTHORITY", 1)
             }
         }
-
     return json.dumps(geom_json)
 
 
@@ -151,5 +155,4 @@ def polygon_from_ring(ring: ogr.Geometry, epsg: int = None) -> Optional[ogr.Geom
             poly.AssignSpatialReference(ref_sys)
         else:
             return None
-
     return poly

@@ -6,12 +6,14 @@ import subprocess
 from typing import Optional
 import logging
 import numpy as np
-
+import osgeo
 from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 
 import agpypeline.geometries as geometries
+
+LAT_LON_EPSG_CODE = 4326
 
 
 def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress: bool = True) -> Optional[np.ndarray]:
@@ -205,6 +207,52 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
             output_raster.GetRasterBand(1).SetNoDataValue(nodata)
 
 
+def get_centroid_latlon(filename: str) -> ogr.Geometry:
+    """Returns the bounds and epsg of a geo-referenced image file
+    Arguments:
+        filename: the path to the file to get the centroid from
+    Returns:
+        Returns the centroid of the geometry loaded from the file in lat-lon coordinates
+        as a result of calling geometries.get_centroid_latlon()
+    Exceptions:
+        RuntimeError is raised if the image is not a geo referenced image with an EPSG code,
+        the EPSG code is not supported, or another problems occurs
+    """
+    epsg = get_epsg(filename)
+
+    poly = get_image_bounds(filename, epsg)
+    if poly is None:
+        msg = "File is not a geo-referenced image file: %s" % filename
+        logging.error(msg)
+        raise RuntimeError(msg)
+    if epsg is None:
+        msg = "EPSG is not found in image file: '%s'" % filename
+        logging.error(msg)
+        raise RuntimeError(msg)
+    # Convert the polygon to lat-lon
+    dest_spatial = osr.SpatialReference()
+    if int(osgeo.__version__[0]) >= 3:
+        # GDAL 3 changes axis order: https://github.com/OSGeo/gdal/issues/1546
+        # pylint: disable=no-member
+        dest_spatial.SetAxisMappingStrategy(osgeo.osr.OAMS_TRADITIONAL_GIS_ORDER)
+
+    if dest_spatial.ImportFromEPSG(int(LAT_LON_EPSG_CODE)) != ogr.OGRERR_NONE:
+        msg = "Failed to import EPSG %s for conversion to lat-lon" % str(LAT_LON_EPSG_CODE)
+        logging.error(msg)
+        raise RuntimeError(msg)
+    ref_sys = osr.SpatialReference()
+    ref_sys.ImportFromEPSG(int(epsg))  # an error would have been caught before this point
+    transform = osr.CoordinateTransformation(ref_sys, dest_spatial)
+    new_src = poly.Clone()
+    if new_src:
+        new_src.Transform(transform)
+    else:
+        msg = "Failed to transform file polygon to lat-lon" % filename
+        logging.error(msg)
+        raise RuntimeError(msg)
+    return new_src.Centroid()
+
+
 def get_epsg(filename: str) -> Optional[str]:
     """Returns the EPSG of the georeferenced image file
     Args:
@@ -229,6 +277,7 @@ def get_image_bounds(file_path: str, default_epsg: int = None) -> Optional[ogr.G
     Arguments:
         file_path: path to the file from which to load the bounds
         default_epsg: the default EPSG to assume if a file has a boundary but not a coordinate system
+        as a result of calling geometries.polygon_from_ring
     Return:
         Returns the geometry representing the image boundary, or None if the
         bounds could not be loaded
@@ -258,7 +307,6 @@ def get_image_bounds(file_path: str, default_epsg: int = None) -> Optional[ogr.G
     ring.AddPoint(bounds[3], bounds[0])  # lower right
     ring.AddPoint(bounds[2], bounds[0])  # lower left
     ring.AddPoint(bounds[2], bounds[1])  # Closing the polygon
-
     return geometries.polygon_from_ring(ring, int(epsg))
 
 
