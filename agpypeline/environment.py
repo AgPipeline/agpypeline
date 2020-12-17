@@ -107,16 +107,6 @@ class __internal__:
                 value = value.decode('UTF-8').strip()
             else:
                 value = value.strip()
-            split_char = None
-            if " " in value:
-                partial = value.split()
-                split_char = " "
-            elif "T" in value:
-                partial = value.split("T")
-                split_char = "T"
-            if split_char is not None:
-                partial_first = partial[0].replace(":", "-")
-                value = partial_first + split_char + partial[1]
 
             # Check for an empty string after stripping colons
             if value:
