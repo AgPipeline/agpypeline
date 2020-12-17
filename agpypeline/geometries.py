@@ -141,8 +141,6 @@ def polygon_from_ring(ring: ogr.Geometry, epsg: int = None) -> Optional[ogr.Geom
     Arguments:
         ring: the linear ring to create the polygon with
         epsg: the EPSG code to assign to the polygon
-        filename: if the epsg is invalid and a filename is specified,
-        the formatted filename is returned in an error message
     Return:
         The created polygon, or None if an EPSG code is specified and can't be loaded
     Exceptions:
