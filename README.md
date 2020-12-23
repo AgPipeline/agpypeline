@@ -1,6 +1,6 @@
 [![license](https://img.shields.io/badge/license-BSD%203-green?logo=Open-Source-Initiative)](https://github.com/AgPipeline/agpypeline/blob/add_badges/LICENSE)
 
-[![PyPI - version](https://img.shields.io/pypi/v/agpypeline?label=AgPypeline&color=green)](https://pypi.org/project/agpypeline/)
+[![PyPI - version](https://img.shields.io/pypi/v/agpypeline?label=current&color=green)](https://pypi.org/project/agpypeline/)
 [![PyPI - downloads](https://img.shields.io/pypi/dm/agpypeline)](https://pypi.org/project/agpypeline/)
 
 # AgPypeline
