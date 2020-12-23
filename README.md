@@ -1,7 +1,7 @@
 [![license](https://img.shields.io/badge/license-BSD%203-green?logo=Open-Source-Initiative)](https://github.com/AgPipeline/agpypeline/blob/add_badges/LICENSE)
 
 [![PyPI version](https://badge.fury.io/py/agpypeline.svg)](https://badge.fury.io/py/agpypeline)
-[![PyPI downloads](https://crate.io/packages/agpypeline)](https://badge.fury.io/py/agpypeline)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/agpypeline)](https://badge.fury.io/py/agpypeline)
 
 # AgPypeline
 Python library of common classes and functions
