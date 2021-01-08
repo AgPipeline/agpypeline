@@ -89,9 +89,7 @@ COPY integration_tests /home/extractor/agpypeline/integration_tests
 RUN python3 -m pip install --upgrade /home/extractor/agpypeline
 
 USER root
-RUN chmod -R 777 /home/extractor/agpypeline/data
-RUN chmod -R 777 /home/extractor/agpypeline/images
-RUN chmod -R 777 /home/extractor/agpypeline/integration_tests
+RUN chmod -R 777 /home/extractor/agpypeline
 
 USER extractor
 ENTRYPOINT ["/home/extractor/agpypeline/integration_tests/basic_algorithm.py"]

@@ -4,10 +4,12 @@
 import argparse
 import datetime
 import logging
-from typing import List, NamedTuple, Optional, Union, TextIO
+import os
+from typing import Optional, Union
 import piexif
 
 from agpypeline.configuration import Configuration
+from agpypeline.checkmd import CheckMD
 
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
@@ -206,40 +208,24 @@ class Environment:
         # hasn't been specified yet
         file_list = []
         working_timestamp = timestamp
-
         if args.file_list:
             for one_file in args.file_list:
                 # Filter out arguments that are obviously not files
-                if not one_file.startswith('-'):
-                    file_list.append(one_file)
+                if not one_file.name.startswith('-'):
+                    file_list.append(one_file.name)
                     # Only bother to get a timestamp if we don't have one specified
                     if timestamp is None:
                         working_timestamp = __internal__.get_first_timestamp(one_file, working_timestamp)
+                one_file.close()
         if timestamp is None:
             timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
 
-        list_files = lambda: file_list
         # Prepare our parameters
         check_md = CheckMD(timestamp=timestamp, season=season_name, experiment=experiment_name,
-                           working_folder=args.working_space, list_files=list_files)
+                           working_folder=args.working_space, list_files=file_list)
 
         # Return dictionary of parameters for Algorithm class method calls
         return {'check_md': check_md,
                 'transformer_md': transformer_md,
                 'full_md': parsed_metadata
                 }
-
-
-# pylint: disable=invalid-name
-class CheckMD(NamedTuple):
-    """This is the CheckMD class based off of NamedTuple which can be used in
-    order to store data passed into argparse."""
-    timestamp: str
-    season: str
-    experiment: str
-    working_folder: str
-    list_files: List[TextIO]
-    container_name: Optional[str] = None
-    target_container_name: Optional[str] = None
-    trigger_name: Optional[str] = None
-    context_md: Optional[str] = None

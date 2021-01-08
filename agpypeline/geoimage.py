@@ -241,7 +241,10 @@ def get_centroid_latlon(filename: str) -> ogr.Geometry:
         logging.error(msg)
         raise RuntimeError(msg)
     ref_sys = osr.SpatialReference()
-    ref_sys.ImportFromEPSG(int(epsg))  # an error would have been caught before this point
+    if ref_sys.ImportFromEPSG(int(epsg)) != ogr.OGRERR_NONE:
+        msg = "Failed to import EPSG %s for conversion to lat-lon" % str(epsg)
+        logging.error(msg)
+        raise RuntimeError(msg)
     transform = osr.CoordinateTransformation(ref_sys, dest_spatial)
     new_src = poly.Clone()
     if new_src:
@@ -289,7 +292,7 @@ def get_image_bounds(file_path: str, default_epsg: int = None) -> Optional[ogr.G
     """
     # Get the bounds (if they exist)
     bounds = image_get_geobounds(file_path)
-    if bounds[0] == np.nan:
+    if np.nan in bounds:
         return None
 
     epsg = get_epsg(file_path)

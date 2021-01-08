@@ -358,8 +358,8 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
     parser.add_argument('--result', nargs='?', default='all',
                         help='Direct the result of a run to one or more of (all is default): "all,file,print"')
 
-    parser.add_argument('-m', '--metadata', type=argparse.FileType('rt'), nargs='+',
-                        required=True, help='The path to the source metadata')
+    parser.add_argument('-m', '--metadata', type=argparse.FileType('rt'), action='append',
+                        help='The path to the source metadata')
 
     parser.add_argument('-w', '--working_space', type=str, default='output',
                         help='the folder to use use as a workspace and for storing results')
@@ -373,7 +373,7 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
         algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
-    parser.add_argument('file_list', nargs='+', type=str,
+    parser.add_argument('file_list', nargs='+', type=argparse.FileType('r'),
                         help='additional files for transformer')
 
 

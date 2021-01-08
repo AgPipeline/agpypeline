@@ -27,8 +27,8 @@ class Tests(unittest.TestCase):
     def test_no_metadata_or_files(self):
         ret_val, out = getstatusoutput(f'{SOURCE_PATH}')
         assert ret_val != 0
-        assert re.search('basic_algorithm.py: error: the following arguments are required:'
-                         ' -m/--metadata, file_list', out)
+        assert re.search('basic_algorithm.py: error: the following arguments'
+                         ' are required: file_list', out)
 
     def test_metadata_no_files(self):
         ret_val, out = getstatusoutput(f'{SOURCE_PATH} --metadata {META}')
