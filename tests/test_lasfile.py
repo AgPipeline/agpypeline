@@ -21,6 +21,7 @@ def test_exists():
 
 
 def test_lasfile_get_las_epsg_from_header():  # More tests might be needed in order to know if it works for a null epsg
+    """Tests whether an epsg can be successfully retrieved from a .las file"""
     assert lasfile.get_las_epsg("images/output.tin.tif") is None
     assert lasfile.get_las_epsg("images/interesting.las") == '4326'
     if os.path.isfile("images/output.tin.tif.aux.xml"):
@@ -30,7 +31,7 @@ def test_lasfile_get_las_epsg_from_header():  # More tests might be needed in or
 def test_lasfile_clip_las():
     """A .las file is needed but is not able to be pushed to GitHub because it is too large"""
     las_info = subprocess.run(['pdal', 'info', 'images/interesting.las'], stderr=subprocess.PIPE,
-                              stdout=subprocess.PIPE)
+                              stdout=subprocess.PIPE, check=True)
     las_info_decoded = json.loads(las_info.stdout.decode())
     bounds = las_info_decoded['stats']['bbox']['native']['bbox']
     try:
@@ -45,7 +46,7 @@ def test_lasfile_clip_las():
         lasfile.clip_las("images/interesting.las",
                          (clip_min_x, clip_max_x, clip_min_y, clip_max_y), "images/clip_las_out.las")
         new_las_info = subprocess.run(['pdal', 'info', 'images/clip_las_out.las'], stderr=subprocess.PIPE,
-                                      stdout=subprocess.PIPE)
+                                      stdout=subprocess.PIPE, check=True)
         new_las_info_decoded = json.loads(new_las_info.stdout.decode())
         new_bounds = new_las_info_decoded['stats']['bbox']['native']['bbox']
         assert abs(new_bounds['minx'] - clip_min_x) / new_bounds['minx'] < 0.01
@@ -65,4 +66,3 @@ def test_lasfile_get_las_extents():
     result = lasfile.get_las_extents("images/interesting.las", 4326)
     json_result = json.loads(result)
     assert check_output == json_result
-

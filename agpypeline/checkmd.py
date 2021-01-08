@@ -1,3 +1,5 @@
+"""CheckMD Class"""
+
 from typing import List, NamedTuple, Optional, TextIO
 
 
@@ -16,4 +18,5 @@ class CheckMD(NamedTuple):
     context_md: Optional[str] = None
 
     def files(self):
+        """Returns list_files"""
         return self.list_files

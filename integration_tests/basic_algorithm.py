@@ -5,7 +5,8 @@ Test algorithm class
 from agpypeline.algorithm import Algorithm
 from agpypeline import entrypoint
 
-from basic_configuration import BasicConfiguration
+from agpypeline.configuration import Configuration
+
 
 class BasicAlgorithm(Algorithm):
     """Test Algorithm For Integration Tests"""
@@ -15,5 +16,5 @@ class BasicAlgorithm(Algorithm):
 
 
 if __name__ == "__main__":
-    CONFIGURATION = BasicConfiguration()
+    CONFIGURATION = Configuration()
     entrypoint.entrypoint(CONFIGURATION, BasicAlgorithm())

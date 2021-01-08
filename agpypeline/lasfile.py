@@ -59,7 +59,8 @@ def get_las_epsg(file_path: str, json_result: dict = None) -> Optional[str]:
         if json_result is not None:
             keys = list(json_result['stats']['bbox'].keys())
         else:
-            stats = subprocess.run(['pdal', 'info', file_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            stats = subprocess.run(['pdal', 'info', file_path], stderr=subprocess.PIPE,
+                                   stdout=subprocess.PIPE, check=True)
             stats_json = json.loads(stats.stdout.decode())
             keys = list(stats_json['stats']['bbox'].keys())
         for key in keys:
@@ -87,7 +88,8 @@ def get_las_extents(file_path: str, default_epsg: int = None) -> Optional[str]:
         of the image is not returned (None) and a warning is logged.
     """
     # Get the bounds and the EPSG code
-    stats = subprocess.run(['pdal', 'info', file_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    stats = subprocess.run(['pdal', 'info', file_path], stderr=subprocess.PIPE,
+                           stdout=subprocess.PIPE, check=True)
     json_result = json.loads(stats.stdout.decode())
     bounds = json_result['stats']['bbox']['native']['bbox']
     epsg = get_las_epsg(file_path, json_result)
