@@ -145,9 +145,12 @@ def test_entrypoint_add_parameters():
     check_result = json.load(open("data/entrypoint_add_parameters.json", 'r'))
     parser = argparse.ArgumentParser()
     entrypoint.add_parameters(parser, algorithm.Algorithm(), environment.Environment(configuration.Configuration()))
-    args = parser.parse_args()
-    for arg in vars(args):
-        assert arg in check_result and check_result[arg] == str(getattr(args, arg))
+    try:
+        args = parser.parse_args()
+        for arg in vars(args):
+            assert arg in check_result and check_result[arg] == str(getattr(args, arg))
+    except SystemExit as sysexit:
+        assert str(sysexit) != "0"
 
 
 def test_entrypoint_do_work():
@@ -155,7 +158,6 @@ def test_entrypoint_do_work():
     parser = argparse.ArgumentParser()
     try:
         result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
-    except RuntimeError as error:
-        assert str(error) == "The Algorithm class method perform_process() must be overridden by a derived class"
-    else:
         assert result == {}
+    except SystemExit as sysexit:
+        assert str(sysexit) != "0"

@@ -1,13 +1,12 @@
 """Functions for handling LAS,LAZ files
 """
 
-import re
+import json
 import os
 from typing import Optional
 import logging
 import subprocess
 from osgeo import ogr
-import liblas
 
 import agpypeline.geometries as geometries
 
@@ -47,26 +46,25 @@ def clip_las(las_path: str, clip_tuple: tuple, out_path: str) -> None:
     os.remove(pdal_dtm)
 
 
-def get_las_epsg_from_header(header: liblas.header.Header) -> Optional[str]:
+def get_las_epsg(file_path: str, json_result: dict = None) -> Optional[str]:
     """Returns the found EPSG code from the LAS header
     Arguments:
-        header: the loaded LAS header to find the SRID in
+        file_path: the path to the file from which to extract the epsg
+        json_result: the json from calling pdal info on a .las file
     Return:
         Returns the SRID as a string if found, None is returned otherwise
     """
     epsg = None
-    search_terms_ordered = ['DATUM', 'AUTHORITY', '"EPSG"', ',']
     try:
-        # Get the WKT from the header, find the DATUM, then finally the EPSG code
-        srs = header.get_srs()
-        wkt = srs.get_wkt().decode('UTF-8')
-        idx = -1
-        for term in search_terms_ordered:
-            idx = wkt.find(term)
-            if idx < 0:
-                break
-        if idx >= 0:
-            epsg = re.search(r'\d+', wkt[idx:])[0]
+        if json_result is not None:
+            keys = list(json_result['stats']['bbox'].keys())
+        else:
+            stats = subprocess.run(['pdal', 'info', file_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+            stats_json = json.loads(stats.stdout.decode())
+            keys = list(stats_json['stats']['bbox'].keys())
+        for key in keys:
+            if 'EPSG' in key:
+                epsg = key.split(':')[1]
     except Exception as ex:
         logging.debug("Unable to find EPSG in LAS file header")
         logging.debug("    exception caught: %s", str(ex))
@@ -89,10 +87,10 @@ def get_las_extents(file_path: str, default_epsg: int = None) -> Optional[str]:
         of the image is not returned (None) and a warning is logged.
     """
     # Get the bounds and the EPSG code
-    las_info = liblas.file.File(file_path, mode='r')
-    min_bound = las_info.header.min
-    max_bound = las_info.header.max
-    epsg = get_las_epsg_from_header(las_info.header)
+    stats = subprocess.run(['pdal', 'info', file_path], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    json_result = json.loads(stats.stdout.decode())
+    bounds = json_result['stats']['bbox']['native']['bbox']
+    epsg = get_las_epsg(file_path, json_result)
     if epsg is None:
         if default_epsg is not None:
             epsg = default_epsg
@@ -101,11 +99,11 @@ def get_las_extents(file_path: str, default_epsg: int = None) -> Optional[str]:
             return None
 
     ring = ogr.Geometry(ogr.wkbLinearRing)
-    ring.AddPoint(min_bound[1], min_bound[0])  # Upper left
-    ring.AddPoint(min_bound[1], max_bound[0])  # Upper right
-    ring.AddPoint(max_bound[1], max_bound[0])  # lower right
-    ring.AddPoint(max_bound[1], min_bound[0])  # lower left
-    ring.AddPoint(min_bound[1], min_bound[0])  # Closing the polygon
+    ring.AddPoint(bounds['minx'], bounds['maxy'])  # Upper left
+    ring.AddPoint(bounds['maxx'], bounds['maxy'])  # Upper right
+    ring.AddPoint(bounds['maxx'], bounds['miny'])  # lower right
+    ring.AddPoint(bounds['minx'], bounds['miny'])  # lower left
+    ring.AddPoint(bounds['minx'], bounds['maxy'])  # Closing the polygon
 
     poly = geometries.polygon_from_ring(ring, int(epsg))
     if poly:

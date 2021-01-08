@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Purpose: Unit testing for configuration.py
+Purpose: Unit testing for basic_configuration.py
 Author : Chris Schnaufer <schnaufer@arizona.edu>
 Notes:
     This file assumes it's in a subfolder off the main folder
