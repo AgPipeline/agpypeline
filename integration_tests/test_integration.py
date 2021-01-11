@@ -25,7 +25,7 @@ def random_string():
 def test_no_metadata_or_files():
     """Test the output when no metadata or file_list is included on the command line"""
     ret_val, out = getstatusoutput(f'{SOURCE_PATH}')
-    assert ret_val != 0
+    assert int(ret_val) != 0
     assert re.search('basic_algorithm.py: error: the following arguments'
                      ' are required: file_list', out)
 
@@ -33,7 +33,7 @@ def test_no_metadata_or_files():
 def test_metadata_no_files():
     """Test the output when no file_list is included on the command line"""
     ret_val, out = getstatusoutput(f'{SOURCE_PATH} --metadata {META}')
-    assert ret_val != 0
+    assert int(ret_val) != 0
     assert re.search('basic_algorithm.py: error: the following arguments are required:'
                      ' file_list', out)
 
@@ -45,4 +45,4 @@ def test_metadata_and_files():
     # create it; for now, we'll create the output dir.
 
     ret_val, out = getstatusoutput(f'{SOURCE_PATH} {INPUT1} --working_space {out_dir} --metadata {META}')
-    assert ret_val != 0
+    assert int(ret_val) == 0 and int(out) == 0
