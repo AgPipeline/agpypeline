@@ -54,7 +54,7 @@ jobs:
         id: install-python-numpy
       - name: Install Python pygdal
         shell: bash
-        run: "(gdal_version=$(gdal-config --version); echo $gdal_version) && (pip install pygdal>=${gdal_version}.0,<=${gdal_version}.999)"
+        run: "(gdal_version=$(gdal-config --version); echo $gdal_version) && (pip install pygdal>=${gdal_version}"
         id: install-python-pygdal
       - name: Install system requirements from source
         shell: bash
