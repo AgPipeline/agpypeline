@@ -4,4 +4,4 @@ numpy
 piexif
 pytest
 shapely
-pdal
+pdal==2.3.3
