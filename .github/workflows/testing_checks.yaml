@@ -25,6 +25,8 @@ jobs:
         id: install_python_3_8
       - name: Updated python version
         run: python3 --version
+      - name: Install PDAL
+        run: sudo apt-get install -y --no-install-recommends pdal
       - name: Update pip
         run: python3 -m pip install --upgrade --no-cache-dir pip
         id: pip-install
