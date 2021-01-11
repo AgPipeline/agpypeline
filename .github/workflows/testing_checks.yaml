@@ -68,7 +68,7 @@ jobs:
         id: install-python-reqs
       - name: Install testpypi agpypeline
         shell: bash
-        run: python -m pip install -i https://test.pypi.org/simple/ agpypeline
+        run: python -m pip install -i https://test.pypi.org/simple/ agpypeline==0.0.99
         id: testpypi agpypeline
       - name: Run action pylint script
         shell: bash
