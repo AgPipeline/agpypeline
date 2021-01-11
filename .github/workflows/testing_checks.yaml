@@ -71,7 +71,7 @@ jobs:
         run: ls
       - name: Install agpypeline for tests
         shell: bash
-        run: python -m pip install -e ./agpypeline
+        run: python -m pip install -e ../agpy
         id: agpypeline_install
       - name: Run action pylint script
         shell: bash
