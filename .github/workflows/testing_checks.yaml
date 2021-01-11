@@ -66,6 +66,9 @@ jobs:
         shell: bash
         run: '[ -s "requirements.txt" ] && (python3 -m pip install --no-cache-dir -r requirements.txt) || (echo "No Python packages to install")'
         id: install-python-reqs
+      - name: check
+        shell: bash
+        run: ls
       - name: Install agpypeline for tests
         shell: bash
         run: python -m pip install -e ./agpypeline
