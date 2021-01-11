@@ -66,6 +66,10 @@ jobs:
         shell: bash
         run: '[ -s "requirements.txt" ] && (python3 -m pip install --no-cache-dir -r requirements.txt) || (echo "No Python packages to install")'
         id: install-python-reqs
+      - name: Install testpypi agpypeline
+        shell: bash
+        run: python -m pip install -i https://test.pypi.org/simple/ agpypeline
+        id: testpypi agpypeline
       - name: Run action pylint script
         shell: bash
         run: '[ -s "action_pylint.sh" ] && (chmod +x "action_pylint.sh" && ./action_pylint.sh) || (echo "Not running special action script - empty or not found")'
