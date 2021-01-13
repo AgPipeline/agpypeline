@@ -3,7 +3,6 @@
 """
 import os
 import random
-import re
 import string
 
 from subprocess import getstatusoutput
