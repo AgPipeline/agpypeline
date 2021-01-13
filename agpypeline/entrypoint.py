@@ -347,11 +347,11 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
         algorithm_instance: working Transformer instance
         environment_instance: the current Environment
     """
-    parser.add_argument('--debug', '-d', action='store_const',
+    parser.add_argument('-d', '--debug', action='store_const',
                         default=logging.WARN, const=logging.DEBUG,
                         help='enable debug logging (default=WARN)')
 
-    parser.add_argument('--info', '-i', action='store_const',
+    parser.add_argument('-i', '--info', action='store_const',
                         default=logging.WARN, const=logging.INFO,
                         help='enable info logging (default=WARN)')
 
@@ -373,7 +373,7 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
         algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
-    parser.add_argument('file_list', nargs='+', type=argparse.FileType('r'),
+    parser.add_argument('file_list', nargs='*', type=argparse.FileType('r'),
                         help='additional files for transformer')
 
 

@@ -9,6 +9,9 @@ import argparse
 import json
 import os
 import string
+import unittest
+
+from subprocess import getstatusoutput
 
 from agpypeline import algorithm, configuration, entrypoint, environment
 
@@ -148,16 +151,16 @@ def test_entrypoint_add_parameters():
     try:
         args = parser.parse_args()
         for arg in vars(args):
-            assert arg in check_result and check_result[arg] == str(getattr(args, arg))
-    except SystemExit as sysexit:
-        assert str(sysexit) != "0"
+            assert arg in check_result and check_result[arg] == getattr(args, arg)
+    except SystemExit:
+        assert False
 
 
 def test_entrypoint_do_work():
     """Tests entrypoint's do_work function by passing in empty parameters"""
-    parser = argparse.ArgumentParser()
     try:
+        parser = argparse.ArgumentParser()
         result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
         assert result == {}
-    except SystemExit as sysexit:
-        assert str(sysexit) != "0"
+    except RuntimeError as e:
+        assert str(e) == "The Algorithm class method perform_process() must be overridden by a derived class"
