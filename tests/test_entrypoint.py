@@ -9,9 +9,6 @@ import argparse
 import json
 import os
 import string
-import unittest
-
-from subprocess import getstatusoutput
 
 from agpypeline import algorithm, configuration, entrypoint, environment
 
@@ -162,5 +159,5 @@ def test_entrypoint_do_work():
         parser = argparse.ArgumentParser()
         result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
         assert result == {}
-    except RuntimeError as e:
-        assert str(e) == "The Algorithm class method perform_process() must be overridden by a derived class"
+    except RuntimeError as runtime_error:
+        assert str(runtime_error) == "The Algorithm class method perform_process() must be overridden by a derived class"
