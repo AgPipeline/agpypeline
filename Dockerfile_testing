@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 LABEL maintainer="Chris Schnaufer <schnaufer@email.arizona.edu>"
-ARG DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Add user
 RUN useradd -u 49044 extractor \
