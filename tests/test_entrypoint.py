@@ -150,7 +150,7 @@ def test_entrypoint_add_parameters():
         for arg in vars(args):
             assert arg in check_result and check_result[arg] == getattr(args, arg)
     except SystemExit:
-        assert False
+        assert False  # SystemExit exception was caught
 
 
 def test_entrypoint_do_work():
