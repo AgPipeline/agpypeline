@@ -145,17 +145,20 @@ def test_entrypoint_add_parameters():
     check_result = json.load(open("data/entrypoint_add_parameters.json", 'r'))
     parser = argparse.ArgumentParser()
     entrypoint.add_parameters(parser, algorithm.Algorithm(), environment.Environment(configuration.Configuration()))
-    args = parser.parse_args()
-    for arg in vars(args):
-        assert arg in check_result and check_result[arg] == str(getattr(args, arg))
+    try:
+        args = parser.parse_args()
+        for arg in vars(args):
+            assert arg in check_result and check_result[arg] == getattr(args, arg)
+    except SystemExit:
+        assert False
 
 
 def test_entrypoint_do_work():
     """Tests entrypoint's do_work function by passing in empty parameters"""
-    parser = argparse.ArgumentParser()
     try:
+        parser = argparse.ArgumentParser()
         result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
-    except RuntimeError as error:
-        assert str(error) == "The Algorithm class method perform_process() must be overridden by a derived class"
-    else:
         assert result == {}
+    except RuntimeError as runtime_error:
+        assert str(runtime_error) == "The Algorithm class method perform_process()" \
+                                     " must be overridden by a derived class"

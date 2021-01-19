@@ -163,8 +163,12 @@ class __internal__:
         metadata = []
         result = {'metadata': metadata}
         for metadata_file in metadata_files:
-            if not os.path.exists(metadata_file):
-                result = __internal__.handle_error(-2, "Unable to access metadata file '%s'" % metadata_file)
+            if hasattr(metadata_file, 'name'):
+                if not metadata_file.closed:
+                    metadata_file.close()
+                metadata_file = metadata_file.name
+            if not os.path.exists(str(metadata_file)):
+                result = __internal__.handle_error(-2, "Unable to access metadata file '%s'" % metadata_file.name)
                 break
             logging.info("Loading metadata from file: '%s'", metadata_file)
             md_loaded = __internal__.load_metadata(metadata_file)
@@ -343,20 +347,21 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
         algorithm_instance: working Transformer instance
         environment_instance: the current Environment
     """
-    parser.add_argument('--debug', '-d', action='store_const',
+    parser.add_argument('-d', '--debug', action='store_const',
                         default=logging.WARN, const=logging.DEBUG,
                         help='enable debug logging (default=WARN)')
 
-    parser.add_argument('--info', '-i', action='store_const',
+    parser.add_argument('-i', '--info', action='store_const',
                         default=logging.WARN, const=logging.INFO,
                         help='enable info logging (default=WARN)')
 
     parser.add_argument('--result', nargs='?', default='all',
                         help='Direct the result of a run to one or more of (all is default): "all,file,print"')
 
-    parser.add_argument('--metadata', type=str, action='append', help='The path to the source metadata')
+    parser.add_argument('-m', '--metadata', type=argparse.FileType('rt'), action='append',
+                        help='The path to the source metadata')
 
-    parser.add_argument('--working_space', type=str,
+    parser.add_argument('-w', '--working_space', type=str, default='output',
                         help='the folder to use use as a workspace and for storing results')
 
     # Let the transformer class add parameters
@@ -368,7 +373,8 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
         algorithm_instance.add_parameters(parser)
 
     # Assume the rest of the arguments are the files
-    parser.add_argument('file_list', nargs=argparse.REMAINDER, help='additional files for transformer')
+    parser.add_argument('file_list', nargs='*', type=argparse.FileType('r'),
+                        help='additional files for transformer')
 
 
 def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
@@ -387,9 +393,11 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     if not transformer_instance:
         result = __internal__.handle_error(-100, "Unable to create transformer class instance for processing")
         return __internal__.handle_result(result, None, None)
-
     add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
+
+    if not os.path.isdir(args.working_space):
+        os.makedirs(args.working_space)
 
     # start logging system
     logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)

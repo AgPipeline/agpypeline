@@ -8,6 +8,7 @@ from typing import Optional, Union
 import piexif
 
 from agpypeline.configuration import Configuration
+from agpypeline.checkmd import CheckMD
 
 # EXIF tags to look for
 EXIF_ORIGIN_TIMESTAMP = 36867  # Capture timestamp
@@ -22,60 +23,6 @@ class __internal__:
     def __init__(self):
         """Perform class level initialization
         """
-
-    @staticmethod
-    def ensure_ts_format(tstamp: str, ts_separator: str = None) -> str:
-        """Tries to ensure the timestamp is in the correct format (ISO 8601)
-        Args:
-            tstamp: the timestamp to correct
-            ts_separator: the separator to use instead of the default values
-        Return:
-            Returns the corrected timestamp or the original if no changes were needed
-        Notes:
-            Whitespace is trimmed from the ends of the ts string before it's  processed.
-            If the ts_separator parameter is not specified and the ts parameter doesn't contain 'T' (per ISO 8601)
-            or ' ' (space) as a separator between the date and time, the original string is returned.
-            If the ts string contains multiple separators the trimmed string is returned.
-        """
-        parts = None
-        cur_ts = tstamp.strip()
-
-        # Check for a separator
-        if ts_separator is not None:
-            parts = cur_ts.split(ts_separator)
-        elif 'T' in cur_ts:
-            parts = cur_ts.split('T')
-        elif ' ' in cur_ts:
-            parts = cur_ts.split(' ')
-
-        # Check validity
-        if len(parts) > 2:
-            logging.warning("Unable to correct timestamp %s", tstamp)
-            return cur_ts
-
-        # If there's only one part, we just return the timestamp
-        if len(parts) == 1:
-            return cur_ts
-
-        # Check for a valid timestamp
-        if '-' in parts[0] and ':' in parts[1]:
-            return 'T'.join(parts)
-
-        # Format the timestamp and return it
-        return_ts = ''
-        separator = '-'
-        part_separator = 'T'
-        for pidx in (0, 1):
-            for idx in range(0, len(parts[pidx])):
-                if parts[pidx][idx].isdigit():
-                    return_ts += parts[pidx][idx]
-                else:
-                    return_ts += separator
-            return_ts += part_separator
-            separator = ':'
-            part_separator = ''
-
-        return return_ts
 
     @staticmethod
     def exif_tags_to_timestamp(exif_tags: dict) -> Optional[datetime.datetime]:
@@ -108,6 +55,17 @@ class __internal__:
             else:
                 value = value.strip()
 
+            split_char = None
+            if " " in value:
+                partial = value.split()
+                split_char = " "
+            elif "T" in value:
+                partial = value.split("T")
+                split_char = "T"
+            if split_char is not None:
+                partial_first = partial[0].replace(":", "-")
+                value = partial_first + split_char + partial[1]
+
             # Check for an empty string after stripping colons
             if value:
                 if not value.replace(":", "").replace("+:", "").replace("-", "").strip():
@@ -117,7 +75,7 @@ class __internal__:
 
         # Process the EXIF data
         if EXIF_ORIGIN_TIMESTAMP in exif_tags:
-            cur_stamp = __internal__.ensure_ts_format(convert_and_clean_tag(exif_tags[EXIF_ORIGIN_TIMESTAMP]))
+            cur_stamp = convert_and_clean_tag(exif_tags[EXIF_ORIGIN_TIMESTAMP])
         if not cur_stamp:
             return None
 
@@ -202,7 +160,7 @@ class Environment:
         """
         # pylint: disable=no-self-use
         parser.epilog = str(self.configuration.transformer_name) + ' version ' \
-            + str(self.configuration.transformer_version) + ' author ' + str(
+                        + str(self.configuration.transformer_version) + ' author ' + str(
             self.configuration.author_name) + ' ' + str(self.configuration.author_email)
 
     def get_transformer_params(self, args: argparse.Namespace, metadata: list) -> dict:
@@ -252,25 +210,18 @@ class Environment:
         if args.file_list:
             for one_file in args.file_list:
                 # Filter out arguments that are obviously not files
-                if not one_file.startswith('-'):
-                    file_list.append(one_file)
+                if not one_file.name.startswith('-'):
+                    file_list.append(one_file.name)
                     # Only bother to get a timestamp if we don't have one specified
                     if timestamp is None:
                         working_timestamp = __internal__.get_first_timestamp(one_file, working_timestamp)
+                one_file.close()
         if timestamp is None:
-            timestamp = working_timestamp if working_timestamp else ''
+            timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
 
         # Prepare our parameters
-        check_md = {'timestamp': timestamp,
-                    'season': season_name,
-                    'experiment': experiment_name,
-                    'container_name': None,
-                    'target_container_name': None,
-                    'trigger_name': None,
-                    'context_md': None,
-                    'working_folder': args.working_space,
-                    'list_files': lambda: file_list
-                    }
+        check_md = CheckMD(timestamp=timestamp, season=season_name, experiment=experiment_name,
+                           working_folder=args.working_space, list_files=file_list)
 
         # Return dictionary of parameters for Algorithm class method calls
         return {'check_md': check_md,
