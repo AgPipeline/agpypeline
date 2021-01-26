@@ -160,4 +160,5 @@ def test_entrypoint_do_work():
         result = entrypoint.do_work(parser, configuration.Configuration(), algorithm.Algorithm())
         assert result == {}
     except RuntimeError as runtime_error:
-        assert str(runtime_error) == "The Algorithm class method perform_process() must be overridden by a derived class"
+        assert str(runtime_error) == "The Algorithm class method perform_process()" \
+                                     " must be overridden by a derived class"
