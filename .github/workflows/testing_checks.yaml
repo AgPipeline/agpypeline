@@ -4,7 +4,6 @@ on:
     branches:
       - master
       - develop
-      - ubuntu_lasfile_changes
   pull_request:
     branches:
       - master
