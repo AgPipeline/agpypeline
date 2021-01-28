@@ -1,4 +1,3 @@
-liblas
 PyYAML
 numpy
 piexif

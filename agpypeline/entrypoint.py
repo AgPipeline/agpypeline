@@ -374,7 +374,8 @@ def add_parameters(parser: argparse.ArgumentParser, algorithm_instance: Algorith
 
     # Assume the rest of the arguments are the files
     parser.add_argument('file_list', nargs='*', type=argparse.FileType('r'),
-                        help='additional files for transformer')
+                        help='additional files, folders, and other information'
+                             ' for the transformer')
 
 
 def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
