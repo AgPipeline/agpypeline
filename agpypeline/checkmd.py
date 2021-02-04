@@ -20,7 +20,3 @@ class CheckMD(NamedTuple):
     def get_list_files(self):
         """Returns list_files"""
         return self.list_files
-
-    def get_working_folder(self):
-        """Returns working_folder"""
-        return self.working_folder
