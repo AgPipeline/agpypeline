@@ -10,13 +10,17 @@ class CheckMD(NamedTuple):
     timestamp: str
     season: str
     experiment: str
-    working_folder: str
     list_files: List[TextIO]
+    working_folder: str
     container_name: Optional[str] = None
     target_container_name: Optional[str] = None
     trigger_name: Optional[str] = None
     context_md: Optional[str] = None
 
-    def files(self):
+    def get_list_files(self):
         """Returns list_files"""
         return self.list_files
+
+    def get_working_folder(self):
+        """Returns working_folder"""
+        return self.working_folder
