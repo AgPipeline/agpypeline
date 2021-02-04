@@ -10,8 +10,8 @@ class CheckMD(NamedTuple):
     timestamp: str
     season: str
     experiment: str
-    list_files: List[TextIO]
     working_folder: str
+    list_files: List[TextIO]
     container_name: Optional[str] = None
     target_container_name: Optional[str] = None
     trigger_name: Optional[str] = None
