@@ -17,6 +17,6 @@ class CheckMD(NamedTuple):
     trigger_name: Optional[str] = None
     context_md: Optional[str] = None
 
-    def files(self):
+    def get_list_files(self):
         """Returns list_files"""
         return self.list_files

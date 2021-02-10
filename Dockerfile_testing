@@ -44,7 +44,7 @@ RUN apt-get update && \
     python3 -m pip install --upgrade --no-cache-dir \
         pylint && \
     python3 -m pip install --upgrade --no-cache-dir \
-        pdal && \
+        pdal==2.3.6 && \
     apt-get remove -y \
         libgdal-dev \
         gcc \
