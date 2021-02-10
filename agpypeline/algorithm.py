@@ -1,6 +1,6 @@
 """Template class for a Transformer Algorithm
 """
-from agpypeline.environment import Environment
+from agpypeline.environment import Environment, CheckMD
 
 
 class Algorithm:
@@ -11,7 +11,7 @@ class Algorithm:
         """Initializes a class instance
         """
 
-    def perform_process(self, environment: Environment, check_md: dict, transformer_md: dict,
+    def perform_process(self, environment: Environment, check_md: CheckMD, transformer_md: dict,
                         full_md: list) -> dict:
         """Perform the processing of data
         Arguments:

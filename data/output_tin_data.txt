@@ -1,0 +1,56 @@
+Driver: GTiff/GeoTIFF
+Files: images/output.tif
+Size is 891, 730
+Coordinate System is:
+PROJCRS["NAD83 / UTM zone 13N",
+    BASEGEOGCRS["NAD83",
+        DATUM["North American Datum 1983",
+            ELLIPSOID["GRS 1980",6378137,298.257222101,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4269]],
+    CONVERSION["UTM zone 13N",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",-105,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9996,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",0,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["unknown"],
+        AREA["North America - 108°W to 102°W and NAD83 by country"],
+        BBOX[28.98,-108,84,-102]],
+    ID["EPSG",26913]]
+Data axis to CRS axis mapping: 1,2
+Metadata:
+  AREA_OR_POINT=Area
+Image Structure Metadata:
+  INTERLEAVE=BAND
+Corner Coordinates:
+Upper Left  (    0.0,    0.0)
+Lower Left  (    0.0,  730.0)
+Upper Right (  891.0,    0.0)
+Lower Right (  891.0,  730.0)
+Center      (  445.5,  365.0)
+Band 1 Block=891x9 Type=Byte, ColorInterp=Gray
+  NoData Value=-99
+b'Driver: GTiff/GeoTIFF\nFiles: images/output.tif\nSize is 891, 730\nCoordinate System is:\nPROJCRS["NAD83 / UTM zone 13N",\n    BASEGEOGCRS["NAD83",\n        DATUM["North American Datum 1983",\n            ELLIPSOID["GRS 1980",6378137,298.257222101,\n                LENGTHUNIT["metre",1]]],\n        PRIMEM["Greenwich",0,\n            ANGLEUNIT["degree",0.0174532925199433]],\n        ID["EPSG",4269]],\n    CONVERSION["UTM zone 13N",\n        METHOD["Transverse Mercator",\n            ID["EPSG",9807]],\n        PARAMETER["Latitude of natural origin",0,\n            ANGLEUNIT["degree",0.0174532925199433],\n            ID["EPSG",8801]],\n        PARAMETER["Longitude of natural origin",-105,\n            ANGLEUNIT["degree",0.0174532925199433],\n            ID["EPSG",8802]],\n        PARAMETER["Scale factor at natural origin",0.9996,\n            SCALEUNIT["unity",1],\n            ID["EPSG",8805]],\n        PARAMETER["False easting",500000,\n            LENGTHUNIT["metre",1],\n            ID["EPSG",8806]],\n        PARAMETER["False northing",0,\n            LENGTHUNIT["metre",1],\n            ID["EPSG",8807]]],\n    CS[Cartesian,2],\n        AXIS["(E)",east,\n            ORDER[1],\n            LENGTHUNIT["metre",1]],\n        AXIS["(N)",north,\n            ORDER[2],\n            LENGTHUNIT["metre",1]],\n    USAGE[\n        SCOPE["unknown"],\n        AREA["North America - 108\xc2\xb0W to 102\xc2\xb0W and NAD83 by country"],\n        BBOX[28.98,-108,84,-102]],\n    ID["EPSG",26913]]\nData axis to CRS axis mapping: 1,2\nMetadata:\n  AREA_OR_POINT=Area\nImage Structure Metadata:\n  INTERLEAVE=BAND\nCorner Coordinates:\nUpper Left  (    0.0,    0.0)\nLower Left  (    0.0,  730.0)\nUpper Right (  891.0,    0.0)\nLower Right (  891.0,  730.0)\nCenter      (  445.5,  365.0)\nBand 1 Block=891x9 Type=Byte, ColorInterp=Gray\n  NoData Value=-99\n'

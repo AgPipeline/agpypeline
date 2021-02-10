@@ -1,4 +1,5 @@
-liblas
 PyYAML
 numpy
 piexif
+pytest
+shapely
