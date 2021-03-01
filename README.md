@@ -3,6 +3,8 @@
 [![PyPI - version](https://img.shields.io/pypi/v/agpypeline?label=current&color=green)](https://pypi.org/project/agpypeline/)
 [![PyPI - downloads](https://img.shields.io/pypi/dm/agpypeline)](https://pypi.org/project/agpypeline/)
 
+[![Enforcing pylint checks](https://github.com/AgPipeline/agpypeline/actions/workflows/testing_checks.yaml/badge.svg)](https://github.com/AgPipeline/agpypeline/actions/workflows/testing_checks.yaml)
+
 # AgPypeline
 Python library of common classes and functions
 
