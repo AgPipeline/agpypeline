@@ -161,7 +161,7 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
     dtype = gdal.GDT_Float32 if as_float else gdal.GDT_Byte
 
     if compress:
-        output_raster = gdal.GetDriverByName('GTiff') .Create(out_path, ncols, nrows, channels, dtype, ['COMPRESS=LZW'])
+        output_raster = gdal.GetDriverByName('GTiff') .Create(out_path, ncols, nrows, channels, dtype, ['COMPRESS=LZW', 'PREDICTOR=2'])
     else:
         output_raster = gdal.GetDriverByName('GTiff').Create(out_path, ncols, nrows, channels, dtype)
 
