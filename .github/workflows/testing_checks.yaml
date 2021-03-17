@@ -1,4 +1,4 @@
-name: Enforcing pylint checks
+name: Enforcing testing checks
 on:
   push:
     branches:

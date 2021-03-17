@@ -134,6 +134,7 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
         gps_bounds: tuple of GeoTIFF coordinates as ( lat (y) min, lat (y) max,
                                                         long (x) min, long (x) max)
         out_path: path to GeoTIFF to be created
+        srid: the SRID of the geographic system to assign to the image
         nodata: NoDataValue to be assigned to raster bands; set to None to ignore
         as_float: whether to use GDT_Float32 data type instead of GDT_Byte (e.g. for decimal numbers)
         image_md: metadata to save with the geotiff
@@ -161,9 +162,9 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
     dtype = gdal.GDT_Float32 if as_float else gdal.GDT_Byte
 
     if compress:
-        output_raster = gdal.GetDriverByName('GTiff') .Create(out_path, ncols, nrows, channels, dtype, ['COMPRESS=LZW'])
+        output_raster = gdal.GetDriverByName('GTiff') .Create(out_path, ncols, nrows, channels, dtype, ['COMPRESS=LZW', 'PREDICTOR=2'])
     else:
-        output_raster = gdal.GetDriverByName('GTiff').Create(out_path, ncols, nrows, channels, dtype)
+        output_raster = gdal.GetDriverByName('GTiff').Create(out_path, ncols, nrows, channels, dtype, ['BIGTIFF=YES'])
 
     output_raster.SetGeoTransform(geotransform)
     srs = osr.SpatialReference()
@@ -172,26 +173,16 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
 
     output_raster.SetMetadata(image_md)
 
-    if channels == 3:
-        # typically 3 channels = RGB channels
-        output_raster.GetRasterBand(1).WriteArray(pixels[:, :, 0].astype('uint8'))
-        output_raster.GetRasterBand(1).SetColorInterpretation(gdal.GCI_RedBand)
-        output_raster.GetRasterBand(1).FlushCache()
-        if nodata:
-            output_raster.GetRasterBand(1).SetNoDataValue(nodata)
-
-        output_raster.GetRasterBand(2).WriteArray(pixels[:, :, 1].astype('uint8'))
-        output_raster.GetRasterBand(2).SetColorInterpretation(gdal.GCI_GreenBand)
-        output_raster.GetRasterBand(2).FlushCache()
-        if nodata:
-            output_raster.GetRasterBand(2).SetNoDataValue(nodata)
-
-        output_raster.GetRasterBand(3).WriteArray(pixels[:, :, 2].astype('uint8'))
-        output_raster.GetRasterBand(3).SetColorInterpretation(gdal.GCI_BlueBand)
-        output_raster.GetRasterBand(3).FlushCache()
-        if nodata:
-            output_raster.GetRasterBand(3).SetNoDataValue(nodata)
-
+    if channels in [3, 4]:
+        # RGB and RGBA channels
+        channel_types = [gdal.GCI_RedBand, gdal.GCI_GreenBand, gdal.GCI_BlueBand, gdal.GCI_AlphaBand]
+        for chan in range(channels):
+            band = chan + 1
+            output_raster.GetRasterBand(band).WriteArray(pixels[:, :, chan].astype('uint8'))
+            output_raster.GetRasterBand(band).SetColorInterpretation(channel_types[chan])
+            output_raster.GetRasterBand(band).FlushCache()
+            if nodata:
+                output_raster.GetRasterBand(band).SetNoDataValue(nodata)
     elif channels > 1:
         for chan in range(channels):
             band = chan + 1

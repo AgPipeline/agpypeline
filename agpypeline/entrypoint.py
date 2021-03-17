@@ -330,12 +330,19 @@ class __internal__:
                 print(json.dumps(result, indent=2))
             if 'file' in type_parts or 'all' in type_parts:
                 if result_file_path:
-                    os.makedirs(os.path.dirname(result_file_path), exist_ok=True)
+                    try:
+                        os.makedirs(os.path.dirname(result_file_path), exist_ok=True)
+                    except OSError:
+                        msg = 'Error while creating result path "%s"' % str(os.path.dirname(result_file_path))
+                        logging.error(msg)
+                        if logging.getLogger().level == logging.DEBUG:
+                            logging.debug('Error creating folder for result file')
+                        logging.warning('Unable to create folders, skipping writing to result file')
                     with open(result_file_path, 'w') as out_file:
                         json.dump(result, out_file, indent=2)
                 else:
                     logging.warning("Writing result to a file was requested but a file path wasn't provided.")
-                    logging.warning("    Skipping writing to a file.")
+                    logging.warning("    Skipping writing to result file.")
 
         return result
 
@@ -397,11 +404,19 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
 
-    if not os.path.isdir(args.working_space):
-        os.makedirs(args.working_space)
-
     # start logging system
     logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)
+
+    if args.working_space and not os.path.isdir(args.working_space):
+        try:
+            os.makedirs(args.working_space)
+        except OSError:
+            msg = 'Error while creating working space path "%s"' % str(args.working_space)
+            logging.warning(msg)
+            if logging.getLogger().level == logging.DEBUG:
+                logging.debug('Error creating working space path')
+            result = __internal__.handle_error(-10, msg)
+            return __internal__.handle_result(result, None, None)
 
     # Check that we have metadata
     if not args.metadata and __internal__.check_metadata_needed(configuration_info):
