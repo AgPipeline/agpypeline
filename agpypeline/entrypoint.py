@@ -412,7 +412,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
             logging.error(msg)
             if logging.getLogger().level == logging.DEBUG:
                 logging.debug('Error creating working space path')
-        result = __internal__.handle_error(-10, "Error while cresting working space path.")
+        result = __internal__.handle_error(-10, "Error while creating working space path.")
         return __internal__.handle_result(result, None, None)
 
     # start logging system
