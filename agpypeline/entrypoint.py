@@ -410,7 +410,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     if args.working_space and not os.path.isdir(args.working_space):
         try:
             os.makedirs(args.working_space)
-        except OSError as ex:
+        except OSError:
             msg = 'Error while creating working space path "%s"' % str(args.working_space)
             logging.warning(msg)
             if logging.getLogger().level == logging.DEBUG:
