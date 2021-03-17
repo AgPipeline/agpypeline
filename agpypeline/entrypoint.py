@@ -409,15 +409,14 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
 
     if args.working_space and not os.path.isdir(args.working_space):
         try:
-            logging.warning('Current folder: %s and working %s', os.getcwd(), str(args.working_space))
             os.makedirs(args.working_space)
         except OSError as ex:
-            msg = 'Error while creating working space path %s Exception: %s' % (str(args.working_space),str(ex))
+            msg = 'Error while creating working space path "%s"' % str(args.working_space)
             logging.warning(msg)
             if logging.getLogger().level == logging.DEBUG:
-                logging.debug('Error creating working space path 2')
-        result = __internal__.handle_error(-10, msg)
-        return __internal__.handle_result(result, None, None)
+                logging.debug('Error creating working space path')
+            result = __internal__.handle_error(-10, msg)
+            return __internal__.handle_result(result, None, None)
 
     # Check that we have metadata
     if not args.metadata and __internal__.check_metadata_needed(configuration_info):
