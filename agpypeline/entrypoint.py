@@ -404,7 +404,7 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
 
-    if not os.path.isdir(args.working_space):
+    if args.working_space and not os.path.isdir(args.working_space):
         try:
             os.makedirs(args.working_space)
         except OSError:
