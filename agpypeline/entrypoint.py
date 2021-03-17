@@ -404,8 +404,12 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
     add_parameters(parser, algorithm_instance, transformer_instance)
     args = parser.parse_args()
 
+    # start logging system
+    logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)
+
     if args.working_space and not os.path.isdir(args.working_space):
         try:
+            logging.warning('Current folder: %s and working %s', os.getcwd(), str(args.working_space))
             os.makedirs(args.working_space)
         except OSError:
             msg = 'Error while creating working space path "%s"' % str(args.working_space)
@@ -414,9 +418,6 @@ def do_work(parser: argparse.ArgumentParser, configuration_info: Configuration,
                 logging.debug('Error creating working space path')
         result = __internal__.handle_error(-10, "Error while creating working space path.")
         return __internal__.handle_result(result, None, None)
-
-    # start logging system
-    logging.getLogger().setLevel(args.debug if args.debug == logging.DEBUG else args.info)
 
     # Check that we have metadata
     if not args.metadata and __internal__.check_metadata_needed(configuration_info):
