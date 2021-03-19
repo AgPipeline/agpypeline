@@ -217,7 +217,7 @@ class Environment:
                         working_timestamp = __internal__.get_first_timestamp(one_file, working_timestamp)
                 one_file.close()
         if timestamp is None:
-            timestamp = working_timestamp if working_timestamp else datetime.datetime.now().isoformat()
+            timestamp = working_timestamp if working_timestamp else ''
 
         # Prepare our parameters
         check_md = CheckMD(timestamp=timestamp, season=season_name, experiment=experiment_name,
