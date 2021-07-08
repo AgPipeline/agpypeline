@@ -11,7 +11,7 @@ from osgeo import gdal
 from osgeo import ogr
 from osgeo import osr
 
-import agpypeline.geometries as geometries
+from agpypeline import geometries
 
 LAT_LON_EPSG_CODE = 4326
 
@@ -40,6 +40,7 @@ def clip_raster(raster_path: str, bounds: tuple, out_path: str = None, compress:
         cmd = 'gdal_translate -projwin %s "%s" "%s"' % (coords, raster_path, out_path)
     else:
         cmd = 'gdal_translate -co COMPRESS=LZW -projwin %s "%s" "%s"' % (coords, raster_path, out_path)
+    # pylint: disable=consider-using-with
     subprocess.call(cmd, shell=True, stdout=open(os.devnull, 'wb'))
     out_px = np.array(gdal.Open(out_path).ReadAsArray())
 

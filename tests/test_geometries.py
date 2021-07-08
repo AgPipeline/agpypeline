@@ -43,12 +43,13 @@ def test_geometries_calculate_centroid_from_wkt():
 def test_geometries_calculate_overlap_percent():
     """Tests calculate_overlap_percent by trying to overlap the bounds from a json file with themselves and then from
     a modified version of themselves"""
-    loaded_file = json.load(open(JSON_FILE, 'r'))
-    check_bounds = loaded_file["features"][0]["geometry"]
-    bounding_box = {"type": "Polygon", "coordinates": [
-        [[408989, 3659975], [408990, 3659975], [408990, 3659972], [408989, 3659972], [408989, 3659975]]]}
-    assert geometries.calculate_overlap_percent(check_bounds, check_bounds) == 1.0
-    assert round(geometries.calculate_overlap_percent(check_bounds, bounding_box), 4) == 0.7591
+    with open(JSON_FILE, 'r') as in_file:
+        loaded_file = json.load(in_file)
+        check_bounds = loaded_file["features"][0]["geometry"]
+        bounding_box = {"type": "Polygon", "coordinates": [
+            [[408989, 3659975], [408990, 3659975], [408990, 3659972], [408989, 3659972], [408989, 3659975]]]}
+        assert geometries.calculate_overlap_percent(check_bounds, check_bounds) == 1.0
+        assert round(geometries.calculate_overlap_percent(check_bounds, bounding_box), 4) == 0.7591
 
 
 def test_geometries_convert_geometry_from_file():
@@ -56,9 +57,11 @@ def test_geometries_convert_geometry_from_file():
     against a file containing function call results"""
     null_input_test = geometries.convert_geometry(None, None)
     assert null_input_test is None
-    loaded_file = json.load(open(JSON_FILE, 'r'))
+    with open(JSON_FILE, 'r') as in_file:
+        loaded_file = json.load(in_file)
     epsg = loaded_file["crs"]['properties']['name'].split('::')[-1]
-    check_result = json.load(open("data/convert_geometry_from_file.json", 'r'))
+    with open("data/convert_geometry_from_file.json", 'r') as result_file:
+        check_result = json.load(result_file)
     for feature in range(len(loaded_file["features"])):
         check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
@@ -72,7 +75,8 @@ def test_geometries_convert_geometry_from_polygon():
     """Tests convert_geometry by checking the function call on geometries
     created from ogr.Geometry and spatial references created from
     osr.SpatialReference against a file containing function call results"""
-    check_result = json.load(open("data/convert_geometry_from_polygon.json", 'r'))
+    with open("data/convert_geometry_from_polygon.json", 'r') as result_file:
+        check_result = json.load(result_file)
     ring = ogr.Geometry(ogr.wkbLinearRing)
     ring.AddPoint(1, 0)
     ring.AddPoint(0, 1)
@@ -100,8 +104,10 @@ def test_geometries_convert_geometry_from_polygon():
 def test_geometries_geometry_to_tuples():
     """Tests geometry_to_tuples by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
-    loaded_file = json.load(open(JSON_FILE, 'r'))
-    check_result = json.load(open("data/geometry_to_tuples.json", 'r'))
+    with open(JSON_FILE, 'r') as in_file:
+        loaded_file = json.load(in_file)
+    with open("data/geometry_to_tuples.json", 'r') as result_file:
+        check_result = json.load(result_file)
     for feature in range(len(loaded_file["features"])):
         check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))
@@ -112,8 +118,10 @@ def test_geometries_geometry_to_tuples():
 def test_geometries_geojson_to_tuples():
     """Tests geojson_to_tuples by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
-    loaded_file = json.load(open(JSON_FILE, 'r'))
-    check_result = json.load(open("data/geojson_to_tuples.json", 'r'))
+    with open(JSON_FILE, 'r') as in_file:
+        loaded_file = json.load(in_file)
+    with open("data/geojson_to_tuples.json", 'r') as result_file:
+        check_result = json.load(result_file)
     for feature in range(len(loaded_file["features"])):
         check_bounds = str(loaded_file["features"][feature]["geometry"])
         result = geometries.geojson_to_tuples(check_bounds)
@@ -123,8 +131,10 @@ def test_geometries_geojson_to_tuples():
 def test_geometries_geometry_to_geojson():
     """Tests geometry_to_geojson by checking the function call on geometries contained within a loaded .json file
     against a file containing function call results"""
-    loaded_file = json.load(open(JSON_FILE, 'r'))
-    check_result = json.load(open("data/geometry_to_geojson.json", 'r'))
+    with open(JSON_FILE, 'r') as in_file:
+        loaded_file = json.load(in_file)
+    with open("data/geometry_to_geojson.json", 'r') as result_file:
+        check_result = json.load(result_file)
     for feature in range(len(loaded_file["features"])):
         check_bounds = loaded_file["features"][feature]["geometry"]
         geometry = ogr.CreateGeometryFromJson(str(check_bounds))

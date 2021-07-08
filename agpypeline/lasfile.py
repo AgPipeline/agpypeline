@@ -8,7 +8,7 @@ import logging
 import subprocess
 from osgeo import ogr
 
-import agpypeline.geometries as geometries
+from agpypeline import geometries
 
 
 def clip_las(las_path: str, clip_tuple: tuple, out_path: str) -> None:
