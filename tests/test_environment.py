@@ -49,7 +49,8 @@ def test_environment_get_first_timestamp():
     arr.append(no_timestamp_res)
     arr.append(later_timestamp_res)
     arr.append(earlier_timestamp_res)
-    checkfile = json.load(open("data/environment_get_first_timestamp.json"))
+    with open("data/environment_get_first_timestamp.json") as in_file:
+        checkfile = json.load(in_file)
     assert no_timestamp_res == checkfile[0]
     assert later_timestamp_res == checkfile[1]
     assert earlier_timestamp_res == checkfile[2]
@@ -88,7 +89,8 @@ def test_environment_get_transformer_params():
     """Checks the call of get_transformer_parameters with default parameters against the output from a .json file
     list_files is set to None because it is a function, and timestamp is set to none because it is the current
      timestamp, which differs from second to second"""
-    check_result = json.load(open("data/environment_get_transformer_params.json"))
+    with open("data/environment_get_transformer_params.json") as in_file:
+        check_result = json.load(in_file)
     environ = environment.Environment(configuration.Configuration())
     namespace = argparse.Namespace()
     namespace.file_list = []
