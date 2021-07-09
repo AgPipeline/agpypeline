@@ -104,8 +104,8 @@ def test_geoimage_create_geotiff():
     lry = uly + (src.RasterYSize * yres)
     gps_bounds = (lry + (uly - lry) / 4, lry + 3 * (uly - lry) / 4, ulx + (lrx - ulx) / 4, ulx + 3 * (lrx - ulx) / 4)
     raster_array = np.array(src.GetRasterBand(1).ReadAsArray())
-    if os.path.isfile("images/output.tif"):
-        os.remove("images/output.tif")
+    if os.path.isfile("images/geoimage_create_geotiff.tif"):
+        os.remove("images/geoimage_create_geotiff.tif")
     geoimage.create_geotiff(raster_array, gps_bounds, out_path="images/geoimage_create_geotiff.tif", srid=26913,
                             nodata=-9999)
     check_output = subprocess.check_output(['gdalinfo', 'images/geoimage_create_geotiff_orig.tif']).decode("utf-8")
@@ -115,6 +115,19 @@ def test_geoimage_create_geotiff():
     new_output_lines = new_output.splitlines()
     new_out = new_output_lines[:1] + new_output_lines[2:]
     assert orig_out == new_out
+
+
+def test_geoimage_create_tiff():
+    """Tests create_tiff"""
+    src = gdal.Open(TEST_IMAGE)
+    # pylint: disable=unused-variable
+    raster_array = np.array(src.GetRasterBand(1).ReadAsArray())
+    if os.path.isfile("images/geoimage_create_tiff.tif"):
+        os.remove("images/geoimage_create_tiff.tif")
+    geoimage.create_tiff(raster_array, out_path="images/geoimage_create_tiff.tif", nodata=-9999)
+    dst = gdal.Open("images/geoimage_create_tiff.tif")
+    dst_array = np.array(dst.GetRasterBand(1).ReadAsArray())
+    assert dst_array.shape == raster_array.shape
 
 
 def test_geoimage_get_epsg():
