@@ -3,7 +3,7 @@
 
 import os
 import subprocess
-from typing import Optional
+from typing import Callable, Optional
 import logging
 import numpy as np
 import osgeo
@@ -125,24 +125,22 @@ def clip_raster_intersection_json(file_path: str, file_bounds: str, plot_bounds:
     return clip_raster_intersection(file_path, file_poly, plot_poly, out_file)
 
 
-def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: int, nodata: int = -99,
-                   as_float: bool = False, image_md: dict = None, compress: bool = False) -> None:
-    """Generate output GeoTIFF file given a numpy pixel array and GPS boundary.
+def common_create_tiff(pixels: np.ndarray, out_path: str, nodata: int = -99, as_float: bool = False,
+                       image_md: dict = None, compress: bool = False,
+                       raster_update_func: Callable[[osgeo.gdal.Dataset], None] = None) -> None:
+    """Common tiff file generating function
     Arguments:
         pixels: numpy array of pixel values.
                     if 2-dimensional array, a single-band GeoTIFF will be created.
                     if 3-dimensional array, a band will be created for each Z dimension.
-        gps_bounds: tuple of GeoTIFF coordinates as ( lat (y) min, lat (y) max,
-                                                        long (x) min, long (x) max)
         out_path: path to GeoTIFF to be created
-        srid: the SRID of the geographic system to assign to the image
         nodata: NoDataValue to be assigned to raster bands; set to None to ignore
         as_float: whether to use GDT_Float32 data type instead of GDT_Byte (e.g. for decimal numbers)
         image_md: metadata to save with the geotiff
         compress: compress image pixels (loss less)
+        raster_update_func: optional callback function for modifying the raster before it's saved. Called
+                before the metadata or pixels are set/saved in the target image.
     """
-    # Disable pylint check that would make code less readable
-    # pylint: disable=too-many-branches
     dimensions = np.shape(pixels)
     if len(dimensions) == 2:
         nrows, ncols = dimensions
@@ -150,27 +148,14 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
     else:
         nrows, ncols, channels = dimensions
 
-    geotransform = (
-        gps_bounds[2],  # upper-left x
-        (gps_bounds[3] - gps_bounds[2]) / float(ncols),  # W-E pixel resolution
-        0,  # rotation (0 = North is up)
-        gps_bounds[1],  # upper-left y
-        0,  # rotation (0 = North is up)
-        -((gps_bounds[1] - gps_bounds[0]) / float(nrows))  # N-S pixel resolution
-    )
-
     # Create output GeoTIFF and set coordinates & projection
     dtype = gdal.GDT_Float32 if as_float else gdal.GDT_Byte
 
-    if compress:
-        output_raster = gdal.GetDriverByName('GTiff') .Create(out_path, ncols, nrows, channels, dtype, ['COMPRESS=LZW', 'PREDICTOR=2'])
-    else:
-        output_raster = gdal.GetDriverByName('GTiff').Create(out_path, ncols, nrows, channels, dtype, ['BIGTIFF=YES'])
+    tiff_options = ['COMPRESS=LZW', 'PREDICTOR=2'] if compress else ['BIGTIFF=IF_NEEDED']
+    output_raster = gdal.GetDriverByName('GTiff').Create(out_path, ncols, nrows, channels, dtype, tiff_options)
 
-    output_raster.SetGeoTransform(geotransform)
-    srs = osr.SpatialReference()
-    srs.ImportFromEPSG(int(srid))
-    output_raster.SetProjection(srs.ExportToWkt())
+    if raster_update_func is not None:
+        raster_update_func(output_raster)
 
     output_raster.SetMetadata(image_md)
 
@@ -197,6 +182,61 @@ def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: i
         output_raster.GetRasterBand(1).FlushCache()
         if nodata:
             output_raster.GetRasterBand(1).SetNoDataValue(nodata)
+
+
+def create_geotiff(pixels: np.ndarray, gps_bounds: tuple, out_path: str, srid: int, nodata: int = -99,
+                   as_float: bool = False, image_md: dict = None, compress: bool = False) -> None:
+    """Generate output GeoTIFF file given a numpy pixel array and GPS boundary.
+    Arguments:
+        pixels: numpy array of pixel values.
+                    if 2-dimensional array, a single-band GeoTIFF will be created.
+                    if 3-dimensional array, a band will be created for each Z dimension.
+        gps_bounds: tuple of GeoTIFF coordinates as ( lat (y) min, lat (y) max,
+                                                        long (x) min, long (x) max)
+        out_path: path to GeoTIFF to be created
+        srid: the SRID of the geographic system to assign to the image
+        nodata: NoDataValue to be assigned to raster bands; set to None to ignore
+        as_float: whether to use GDT_Float32 data type instead of GDT_Byte (e.g. for decimal numbers)
+        image_md: metadata to save with the geotiff
+        compress: compress image pixels (loss less)
+    """
+    def set_geotransform(raster: osgeo.gdal.Dataset) -> None:
+        """Internal function sets the geotransformation information for the image before it's saved
+        Arguments:
+            raster: the raster to setup
+        """
+        geotransform = (
+            gps_bounds[2],  # upper-left x
+            (gps_bounds[3] - gps_bounds[2]) / float(raster.RasterXSize),  # W-E pixel resolution
+            0,  # rotation (0 = North is up)
+            gps_bounds[1],  # upper-left y
+            0,  # rotation (0 = North is up)
+            -((gps_bounds[1] - gps_bounds[0]) / float(raster.RasterYSize))  # N-S pixel resolution
+        )
+
+        raster.SetGeoTransform(geotransform)
+        srs = osr.SpatialReference()
+        srs.ImportFromEPSG(int(srid))
+        raster.SetProjection(srs.ExportToWkt())
+
+    # Call the common code to create the raster
+    common_create_tiff(pixels, out_path, nodata, as_float, image_md, compress, set_geotransform)
+
+
+def create_tiff(pixels: np.ndarray, out_path: str, nodata: int = -99, as_float: bool = False,
+                image_md: dict = None, compress: bool = False) -> None:
+    """Generate output GeoTIFF file given a numpy pixel array and GPS boundary.
+    Arguments:
+        pixels: numpy array of pixel values.
+                    if 2-dimensional array, a single-band GeoTIFF will be created.
+                    if 3-dimensional array, a band will be created for each Z dimension.
+        out_path: path to GeoTIFF to be created
+        nodata: NoDataValue to be assigned to raster bands; set to None to ignore
+        as_float: whether to use GDT_Float32 data type instead of GDT_Byte (e.g. for decimal numbers)
+        image_md: metadata to save with the geotiff
+        compress: compress image pixels (loss less)
+    """
+    common_create_tiff(pixels, out_path, nodata, as_float, image_md, compress)
 
 
 def get_centroid_latlon(filename: str) -> ogr.Geometry:
