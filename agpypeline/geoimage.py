@@ -282,7 +282,7 @@ def get_centroid_latlon(filename: str) -> ogr.Geometry:
     if new_src:
         new_src.Transform(transform)
     else:
-        msg = "Failed to transform file polygon to lat-lon" % filename
+        msg = "Failed to transform file polygon to lat-lon %s" % filename
         logging.error(msg)
         raise RuntimeError(msg)
     return new_src.Centroid()
