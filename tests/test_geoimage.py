@@ -33,7 +33,7 @@ def test_geoimage_clip_raster():
         os.remove("images/test_geoimage_clip_raster.tif")
     new_image = "images/test_geoimage_clip_raster.tif"
     # pylint: disable=consider-using-with
-    open(new_image, 'w')
+    open(new_image, 'w', encoding='utf-8')
     src = gdal.Open(TEST_IMAGE)
     ulx, xres, _, uly, _, yres = src.GetGeoTransform()
     lrx = ulx + (src.RasterXSize * xres)
@@ -51,7 +51,7 @@ def test_geoimage_clip_raster_intersection():
     """Checks the output when calling clip_raster_intersection on an image, using metadata from the data folder
     in order to make sure that the function output is correct"""
     file_bounds = geoimage.get_image_bounds(TEST_IMAGE)
-    with open(JSON_FILE) as in_file:
+    with open(JSON_FILE, encoding='utf-8') as in_file:
         geo_json = json.load(in_file)
     for feature in range(len(geo_json["features"])):
         geometry = geo_json["features"][feature]["geometry"]
@@ -61,7 +61,7 @@ def test_geoimage_clip_raster_intersection():
         assert no_overlap_result is None
     complete_overlap = geoimage.clip_raster_intersection(TEST_IMAGE, file_bounds, file_bounds,
                                                          "images/geoimage_clip_raster_intersection.tif")
-    with open("data/geoimage_clip_raster_intersection.json", 'r') as result_file:
+    with open("data/geoimage_clip_raster_intersection.json", 'r', encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     assert check_result["complete_overlap"] == str(complete_overlap)
     new_image_bounds = geoimage.get_image_bounds("images/test_geoimage_clip_raster.tif")
@@ -75,7 +75,7 @@ def test_geoimage_clip_raster_intersection_json():
     data folder in order to make sure that the function output is correct"""
     file_bounds = geoimage.get_image_bounds(TEST_IMAGE)
     json_file_bounds = str(json.loads(geometries.geometry_to_geojson(file_bounds)))
-    with open(JSON_FILE) as in_file:
+    with open(JSON_FILE, encoding='utf-8') as in_file:
         geo_json = json.load(in_file)
     for feature in range(len(geo_json["features"])):
         json_plot_bounds = json.dumps(geo_json["features"][feature]["geometry"])
@@ -84,7 +84,7 @@ def test_geoimage_clip_raster_intersection_json():
         assert no_overlap_result is None
     complete_overlap = geoimage.clip_raster_intersection_json(TEST_IMAGE, json_file_bounds, json_file_bounds,
                                                               "images/geoimage_clip_raster_intersection_json.tif")
-    with open("data/geoimage_clip_raster_intersection_json.json", 'r') as result_file:
+    with open("data/geoimage_clip_raster_intersection_json.json", 'r', encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     assert check_result["complete_overlap"] == str(complete_overlap)
     new_image_bounds = geoimage.get_image_bounds("images/test_geoimage_clip_raster.tif")
@@ -141,7 +141,7 @@ def test_geoimage_get_image_bounds():
     bad_file_res = geoimage.get_image_bounds("")
     assert bad_file_res is None
     res = geoimage.get_image_bounds(TEST_IMAGE)
-    with open("data/geoimage_get_image_bounds.json") as result_file:
+    with open("data/geoimage_get_image_bounds.json", encoding='utf-8') as result_file:
         check_arr = json.load(result_file)
     assert str(res) == check_arr[0]
     res2 = geoimage.get_image_bounds(TEST_IMAGE, 3614)
@@ -150,7 +150,7 @@ def test_geoimage_get_image_bounds():
 
 def test_geoimage_get_image_bounds_json():
     """Tests get_image_bounds_json on a geotiff file against output from a .json file in the data folder"""
-    with open("data/geoimage_get_image_bounds_json.json") as result_file:
+    with open("data/geoimage_get_image_bounds_json.json", encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     res = geoimage.get_image_bounds_json(TEST_IMAGE)
     assert str(res) == check_result
@@ -161,7 +161,7 @@ def test_geoimage_image_get_geobounds():
     not_found_res = geoimage.image_get_geobounds("")
     assert not_found_res, [nan, nan, nan, nan]
     res = geoimage.image_get_geobounds(TEST_IMAGE)
-    with open("data/geoimage_image_get_geobounds.json") as result_file:
+    with open("data/geoimage_image_get_geobounds.json", encoding='utf-8') as result_file:
         check = json.load(result_file)
     assert res == check
 

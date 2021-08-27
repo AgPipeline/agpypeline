@@ -60,7 +60,7 @@ class __internal__:
                 load_func = yaml.safe_load
             else:
                 load_func = json.load
-            with open(metadata_path, 'r') as in_file:
+            with open(metadata_path, 'r', encoding='utf-8') as in_file:
                 md_load = load_func(in_file)
                 if md_load is not None:
                     md_return = {'metadata': md_load}
@@ -338,7 +338,7 @@ class __internal__:
                         if logging.getLogger().level == logging.DEBUG:
                             logging.debug('Error creating folder for result file')
                         logging.warning('Unable to create folders, skipping writing to result file')
-                    with open(result_file_path, 'w') as out_file:
+                    with open(result_file_path, 'w', encoding='utf-8') as out_file:
                         json.dump(result, out_file, indent=2)
                 else:
                     logging.warning("Writing result to a file was requested but a file path wasn't provided.")

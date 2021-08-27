@@ -62,7 +62,7 @@ def test_lasfile_clip_las():
 
 def test_lasfile_get_las_extents():
     """Get the extents of a LAS file"""
-    with open("data/lasfile_get_las_extents.json") as in_file:
+    with open("data/lasfile_get_las_extents.json", encoding='utf-8') as in_file:
         check_output = json.load(in_file)
     result = lasfile.get_las_extents("images/interesting.las", 4326)
     json_result = json.loads(result)
