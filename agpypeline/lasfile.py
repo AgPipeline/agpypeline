@@ -23,7 +23,7 @@ def clip_las(las_path: str, clip_tuple: tuple, out_path: str) -> None:
     bounds_str = "([%s, %s], [%s, %s])" % (clip_tuple[0], clip_tuple[1], clip_tuple[2], clip_tuple[3])
 
     pdal_dtm = out_path.replace(".las", "_dtm.json")
-    with open(pdal_dtm, 'w') as dtm:
+    with open(pdal_dtm, 'w', encoding='utf-8') as dtm:
         dtm_data = """{
             "pipeline": [
                 "%s",

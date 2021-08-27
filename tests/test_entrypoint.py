@@ -27,7 +27,7 @@ def test_entrypoint_handle_error():
     entry = entrypoint.__internal__()
     bad_result = entry.handle_error(None, None)
     assert bad_result == {'error': 'An error has occurred with error code (-1)', 'code': -1}
-    with open('data/entrypoint_handle_error.json', 'r') as checkfile:
+    with open('data/entrypoint_handle_error.json', 'r', encoding='utf-8') as checkfile:
         data = json.load(checkfile)
         letters = list(string.ascii_letters)
         count = 0
@@ -42,7 +42,7 @@ def test_entrypoint_load_metadata():
     entry = entrypoint.__internal__()
     bad_result = entry.load_metadata("")
     assert bad_result == {'error': "Unable to load metadata file ''"}
-    with open("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json") as result_file:
+    with open("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json", encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     assert entry.load_metadata("data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json")['metadata'] \
            == check_result
@@ -54,7 +54,7 @@ def test_entrypoint_check_params_result_error():
     entry = entrypoint.__internal__()
     result_none = entry.check_params_result_error({})
     assert result_none is None
-    with open("data/entrypoint_check_params_result_error.json") as result_file:
+    with open("data/entrypoint_check_params_result_error.json", encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     for i in range(100):
         if i < 50:
@@ -70,7 +70,7 @@ def test_entrypoint_check_retrieve_results_error():
     entry = entrypoint.__internal__()
     result_none = entry.check_retrieve_results_error(None)
     assert result_none is None
-    with open("data/entrypoint_check_retrieve_results_error.json") as result_file:
+    with open("data/entrypoint_check_retrieve_results_error.json", encoding='utf-8') as result_file:
         data = json.load(result_file)
     for i in range(-75, 50):
         if i < -50:
@@ -86,7 +86,7 @@ def test_entrypoint_load_metadata_files():
     as these"""
     entry = entrypoint.__internal__()
     assert entry.load_metadata_files([]) == {'metadata': []}
-    with open("data/entrypoint_load_metadata_files.json") as result_file:
+    with open("data/entrypoint_load_metadata_files.json", encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     assert entry.load_metadata_files(
         ["data/08f445ef-b8f9-421a-acf1-8b8c206c1bb8_metadata_cleaned.json"]) == check_result
@@ -138,17 +138,17 @@ def test_entrypoint_handle_result():
     assert entry.handle_result({}, 'print') == {}
     delete_txt_file()
     result1 = entry.handle_result({}, 'file', 'data/entrypoint_handle_result.txt')
-    with open("data/entrypoint_handle_result.txt") as result_file:
+    with open("data/entrypoint_handle_result.txt", encoding='utf-8') as result_file:
         assert result1 == json.load(result_file)
     delete_txt_file()
     result2 = entry.handle_result({}, 'all', 'data/entrypoint_handle_result.txt')
-    with open("data/entrypoint_handle_result.txt") as result_file:
+    with open("data/entrypoint_handle_result.txt", encoding='utf-8') as result_file:
         assert result2 == json.load(result_file)
 
 
 def test_entrypoint_add_parameters():
     """Tests entrypoint's add_parameters function by passing in empty parameters"""
-    with open("data/entrypoint_add_parameters.json", 'r') as result_file:
+    with open("data/entrypoint_add_parameters.json", 'r', encoding='utf-8') as result_file:
         check_result = json.load(result_file)
     parser = argparse.ArgumentParser()
     entrypoint.add_parameters(parser, algorithm.Algorithm(), environment.Environment(configuration.Configuration()))
