@@ -26,6 +26,6 @@ def test_configuration():
                   'transformer_type', 'author_name', 'author_email', 'contributors', 'repository']:
         assert hasattr(config, entry)
         if entry == 'contributors':
-            assert getattr(config, entry) == []
+            assert not getattr(config, entry)
         else:
             assert getattr(config, entry) is None

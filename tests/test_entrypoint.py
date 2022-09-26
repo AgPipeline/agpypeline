@@ -98,7 +98,7 @@ def test_entrypoint_handle_check_continue_parse_continue_result():
     entry = entrypoint.__internal__()
     result = entry.handle_check_continue(algorithm.Algorithm(), environment.Environment(configuration.Configuration()),
                                          {})
-    assert result == {}
+    assert not result
 
 
 def test_entrypoint_handle_retrieve_files():
@@ -133,9 +133,9 @@ def test_entrypoint_handle_result():
             os.remove("data/entrypoint_handle_result.txt")
 
     entry = entrypoint.__internal__()
-    assert entry.handle_result({}) == {}
-    assert entry.handle_result({}, "", "") == {}
-    assert entry.handle_result({}, 'print') == {}
+    assert not entry.handle_result({})
+    assert not entry.handle_result({}, "", "")
+    assert not entry.handle_result({}, 'print')
     delete_txt_file()
     result1 = entry.handle_result({}, 'file', 'data/entrypoint_handle_result.txt')
     with open("data/entrypoint_handle_result.txt", encoding='utf-8') as result_file:

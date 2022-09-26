@@ -20,5 +20,5 @@ class Algorithm:
             transformer_md: transformer specific information from previous runs
             full_md: the list of loaded metadata
         """
-        # pylint: disable=unused-argument,no-self-use
+        # pylint: disable=unused-argument
         raise RuntimeError("The Algorithm class method perform_process() must be overridden by a derived class")
