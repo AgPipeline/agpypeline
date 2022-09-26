@@ -13,7 +13,6 @@ from agpypeline.environment import Environment
 class BasicAlgorithm(Algorithm):
     """Test Algorithm For Integration Tests"""
 
-    # pylint: disable=no-self-use
     def perform_process(self, environment: Environment, check_md: CheckMD, transformer_md: dict,
                         full_md: list) -> dict:
         """Perform the processing of data

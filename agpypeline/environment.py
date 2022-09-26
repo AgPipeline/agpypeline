@@ -144,7 +144,6 @@ class Environment:
         Returns:
             Returns the transformer metadata
         """
-        # pylint: disable=no-self-use
         return {
             'version': self.configuration.transformer_version,
             'name': self.configuration.transformer_name,
@@ -158,7 +157,6 @@ class Environment:
         Arguments:
             parser: instance of argparse
         """
-        # pylint: disable=no-self-use
         parser.epilog = str(self.configuration.transformer_name) + ' version ' \
                         + str(self.configuration.transformer_version) + ' author ' + str(
             self.configuration.author_name) + ' ' + str(self.configuration.author_email)
