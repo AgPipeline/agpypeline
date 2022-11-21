@@ -13,6 +13,8 @@ This is an installable package derived from the [base-image](https://github.com/
 
 It's recommended reading the information on [Transformer architecture](https://agpipeline.github.io/transformers/transformers) first to gain a better understanding how the library is structured.
 
+The last version supporting Ubuntu 20.04 is [0.0.50](https://pypi.org/project/agpypeline/0.0.50/)
+
 ## Expected metadata
 There are several metadata key/value pairs that a user of entrypoint and environment modules expects to receive.
 The metadata keys listed below are all defined in the [BRAPI V1.3](https://brapi.docs.apiary.io/#) standard.
