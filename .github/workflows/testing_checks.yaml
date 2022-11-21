@@ -17,13 +17,15 @@ on:
 
 jobs:
   update_python:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Running testing checks
     steps:
       - name: Current python version
         run: python3 --version || echo python3 not installed
       - name: Install Python 3.8
-        run: sudo apt-get install -y --no-install-recommends python3.8 python3-pip && sudo ln -sfn /usr/bin/python3.8 /usr/bin/python3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
         id: install_python_3_8
       - name: Updated python version
         run: python3 --version

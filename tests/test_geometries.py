@@ -16,6 +16,9 @@ from agpypeline import geometries
 TEST_FILES = ['agpypeline/geometries.py']
 JSON_FILE = os.path.realpath('data/geometries.json')
 
+# Smallest error allowed when comparing calculated geometry values
+GEOM_MIN_ERROR = 0.000000001
+
 
 def test_exists():
     """Tests whether all necessary files are accessible"""
@@ -48,8 +51,8 @@ def test_geometries_calculate_overlap_percent():
         check_bounds = loaded_file["features"][0]["geometry"]
         bounding_box = {"type": "Polygon", "coordinates": [
             [[408989, 3659975], [408990, 3659975], [408990, 3659972], [408989, 3659972], [408989, 3659975]]]}
-        assert geometries.calculate_overlap_percent(check_bounds, check_bounds) == 1.0
-        assert round(geometries.calculate_overlap_percent(check_bounds, bounding_box), 4) == 0.7591
+        assert abs(geometries.calculate_overlap_percent(check_bounds, check_bounds) - 1.0) <= GEOM_MIN_ERROR
+        assert abs(round(geometries.calculate_overlap_percent(check_bounds, bounding_box), 4) - 0.7591) <= GEOM_MIN_ERROR
 
 
 def test_geometries_convert_geometry_from_file():
@@ -98,7 +101,7 @@ def test_geometries_convert_geometry_from_polygon():
     check2 = geometries.geometry_to_tuples(result2)
     different_epsg = check_result["different_epsg"]
     for i in range(len(list(check2))):
-        assert check2[i] - different_epsg[i] <= 1e-6
+        assert abs(check2[i] - different_epsg[i]) <= GEOM_MIN_ERROR
 
 
 def test_geometries_geometry_to_tuples():
