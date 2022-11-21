@@ -17,7 +17,7 @@ on:
 
 jobs:
   update_python:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Running testing checks
     steps:
       - name: Current python version
