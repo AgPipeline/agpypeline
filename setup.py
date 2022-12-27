@@ -24,7 +24,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.8',
-    install_requires=['setuptools==50.0.1', 'numpy', 'influxdb', 'requests>=2.21.0', 'python-dateutil', 'utm',
+    install_requires=['setuptools==65.5.1', 'numpy', 'influxdb', 'requests>=2.21.0', 'python-dateutil', 'utm',
                       'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography', 'pyyaml', 'pygdal==3.4.1.*',]
 
 )
