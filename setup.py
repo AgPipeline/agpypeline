@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="agpypeline",
-    version="0.0.51",
+    version="0.0.52",
     author="Jacob van der Leeuw",
     author_email="jvanderleeuw@email.arizona.edu",
     description="Installable package for entrypoint and drone-specific environment code within a transformer",
@@ -24,7 +24,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.8',
-    install_requires=['setuptools==50.0.1', 'numpy', 'influxdb', 'requests>=2.21.0', 'python-dateutil', 'utm',
+    install_requires=['setuptools==65.5.1', 'numpy', 'influxdb', 'requests>=2.21.0', 'python-dateutil', 'utm',
                       'matplotlib', 'Pillow', 'scipy', 'piexif', 'cryptography', 'pyyaml', 'pygdal==3.4.1.*',]
 
 )
